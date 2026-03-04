@@ -295,31 +295,47 @@ class Agent:
     # -------------------------------------------------------------------------
 
     def _execute_tool(self, action: str, params: Dict[str, Any]) -> str:
+        # Pre-validation of common parameters
+        path = params.get("path")
+        
         if action == "create_file":
-            return self.tools.create_file(params.get("path"), params.get("content", ""))
+            if not path: return "Error: Missing 'path' parameter for create_file."
+            return self.tools.create_file(path, params.get("content", ""))
         elif action == "edit_file":
-            return self.tools.edit_file(params.get("path"), params.get("old", ""), params.get("new", ""))
+            if not path: return "Error: Missing 'path' parameter for edit_file."
+            return self.tools.edit_file(path, params.get("old", ""), params.get("new", ""))
         elif action == "grep_search":
-            return self.tools.grep_search(params.get("query", ""))
+            query = params.get("query")
+            if not query: return "Error: Missing 'query' parameter for grep_search."
+            return self.tools.grep_search(query)
         elif action == "read_file":
-            return self.tools.read_file(params.get("path"))
+            if not path: return "Error: Missing 'path' parameter for read_file."
+            return self.tools.read_file(path)
         elif action == "list_dir":
-            return self.tools.list_dir(params.get("path", "."))
+            return self.tools.list_dir(path or ".")
         elif action == "find_by_name":
-            return self.tools.find_by_name(params.get("pattern", "*"))
+            pattern = params.get("pattern") or "*"
+            return self.tools.find_by_name(pattern)
         elif action == "delete_file":
-            return self.tools.delete_file(params.get("path"))
+            if not path: return "Error: Missing 'path' parameter for delete_file."
+            return self.tools.delete_file(path)
         elif action == "move_file":
-            return self.tools.move_file(params.get("old"), params.get("new"))
+            old_p = params.get("old")
+            new_p = params.get("new")
+            if not old_p or not new_p: return "Error: Missing 'old' or 'new' parameters for move_file."
+            return self.tools.move_file(old_p, new_p)
         elif action == "list_files" or action == "search_files":
             return self.tools.search_files(params.get("pattern", "*"))
         elif action == "get_system_info":
             return self.tools.get_system_info()
         elif action == "run_command":
-            return self.tools.run_command(params.get("command", ""))
+            cmd = params.get("command")
+            if not cmd: return "Error: Missing 'command' parameter for run_command."
+            return self.tools.run_command(cmd)
         elif action == "search_web":
             api_key = self.config_manager.config.get("brave_api_key", "")
             query = params.get("query") or params.get("q", "")
+            if not query: return "Error: Missing 'query' parameter for search_web."
             return self.tools.search_web(query, api_key)
         else:
             return f"Unknown action: {action}"

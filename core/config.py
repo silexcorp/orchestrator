@@ -88,26 +88,36 @@ class ConfigManager:
 
                 # HEURISTIC: Force update "default" prompt and add missing specialized agents
                 current_agent_ids = {a.get("id") for a in data.get("agents", [])}
+                config_changed = False
+                
                 for default_agent in DEFAULT_CONFIG["agents"]:
                     if default_agent["id"] not in current_agent_ids:
                         data["agents"].append(default_agent)
+                        current_agent_ids.add(default_agent["id"])
+                        config_changed = True
                         print(f"Added missing agent: {default_agent['name']}")
                     elif default_agent["id"] == "default":
                         # Always update the default agent prompt to ensure it has the latest tools instructions
                         for a in data["agents"]:
                             if a["id"] == "default":
-                                a["prompt"] = default_agent["prompt"]
+                                if a.get("prompt") != default_agent["prompt"]:
+                                    a["prompt"] = default_agent["prompt"]
+                                    config_changed = True
                                 break
                 
                 # Ensure all tools from DEFAULT_CONFIG are present in the loaded data
                 if "tools" not in data:
                     data["tools"] = DEFAULT_CONFIG["tools"]
+                    config_changed = True
                 else:
                     for tool_name, enabled in DEFAULT_CONFIG["tools"].items():
                         if tool_name not in data["tools"]:
                             data["tools"][tool_name] = enabled
+                            config_changed = True
 
                 self.config = data
+                if config_changed:
+                    self.save()
                 return data
         except Exception as e:
             print(f"Error loading config: {e}")

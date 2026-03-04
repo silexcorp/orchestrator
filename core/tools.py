@@ -11,7 +11,9 @@ class ToolExecutor:
         if self.workspace_path and not os.path.exists(self.workspace_path):
             os.makedirs(self.workspace_path)
 
-    def _full_path(self, path: str) -> str:
+    def _full_path(self, path: Optional[str]) -> str:
+        if not path:
+            raise ValueError("No path provided for the operation.")
         if not self.workspace_path:
             raise ValueError("No workspace opened. Please open a folder first.")
         # Prevent path traversal
