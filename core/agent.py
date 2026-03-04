@@ -303,6 +303,14 @@ class Agent:
             return self.tools.grep_search(params.get("query", ""))
         elif action == "read_file":
             return self.tools.read_file(params.get("path"))
+        elif action == "list_dir":
+            return self.tools.list_dir(params.get("path", "."))
+        elif action == "find_by_name":
+            return self.tools.find_by_name(params.get("pattern", "*"))
+        elif action == "delete_file":
+            return self.tools.delete_file(params.get("path"))
+        elif action == "move_file":
+            return self.tools.move_file(params.get("old"), params.get("new"))
         elif action == "list_files" or action == "search_files":
             return self.tools.search_files(params.get("pattern", "*"))
         elif action == "get_system_info":
