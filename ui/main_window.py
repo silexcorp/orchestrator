@@ -129,6 +129,7 @@ class MainWindow(QMainWindow):
             ("File Explorer", self.file_tree),
             ("Code Editor", self.editor),
             ("Agent Chat", self.chat),
+            ("Chat History Sidebar", None),
             ("Terminal", self.terminal),
             ("Log Panel", self.log_panel)
         ]
@@ -168,9 +169,15 @@ class MainWindow(QMainWindow):
             "File Explorer": self.file_tree,
             "Code Editor": self.editor,
             "Agent Chat": self.chat,
+            "Chat History Sidebar": None, # Handled specially
             "Terminal": self.terminal,
             "Log Panel": self.log_panel
         }
+        
+        if name == "Chat History Sidebar":
+            self.chat.set_sidebar_visible(visible)
+            return
+
         widget = widget_map.get(name)
         if widget:
             widget.setVisible(visible)

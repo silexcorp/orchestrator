@@ -20,6 +20,12 @@ class Agent:
         self.system_prompt = agent_conf.get("prompt", "")
         self.name = agent_conf.get("name", "Agent")
 
+    def clear_history(self):
+        self.history = []
+
+    def set_history(self, history: List[Dict[str, str]]):
+        self.history = history
+
     def run(self, user_input: str) -> Generator[Dict[str, Any], None, None]:
         # Reload system prompt from config in case it changed
         agent_conf = self.config_manager.get_active_agent()
