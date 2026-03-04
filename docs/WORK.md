@@ -34,8 +34,9 @@ Tasks are broken down into "Issues" (pending, in progress, blocked, closed). The
 
 ## Available Tools
 
-- **Files**: `read_file`, `edit_file`, `create_file`, `list_files`.
-- **System**: `run_command` (requires approval if it's a destructive command).
+- **Files**: `read_file`, `edit_file`, `create_file`, `search_files` (glob).
+- **System**: `run_command`, `get_system_info` (time/OS).
+- **Internet**: `search_web` (Brave Search API).
 - **Project**: `workspace_snapshot`.
 
 ---

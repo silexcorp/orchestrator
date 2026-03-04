@@ -32,8 +32,18 @@ Orchestrator remembers your work pace. When closing the program, it is automatic
 *   The list of files you had in tabs.
 *   The Ollama model you were using.
 *   The size and position of panels (Splitters).
+*   **Panel Visibility**: Preferences for showing/hiding the File Explorer, Terminal, Log Panel, and Chat History Sidebar.
+*   **Model Choice**: Remembers the last selected Ollama model.
 
-## Agent Tools for the Workspace
+## Multi-Chat & Conversation Persistence
+
+Orchestrator now supports multiple independent chat sessions. Each session is a standalone context:
+- **Independent Histories**: The agent's knowledge of the conversation is saved per-chat.
+- **Auto-Titling**: New chats are automatically named based on your first input for easy organization.
+- **Full History Storage**: Assistant thoughts, tool executions, and observations are all persisted.
+- **Location**: Conversations are stored as JSON files in `~/.orchestrator_ai/chats/`.
+
+## Layout & Splitting
 
 The agent has access to specialized tools to navigate the project:
 

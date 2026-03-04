@@ -10,6 +10,8 @@ Reference of the current capabilities of the Python version of Orchestrator.
 | **Remote Providers**| Stable | Support for OpenAI, Anthropic, OpenRouter, and xAI. |
 | **MCP Server** | Stable | OpenAI-compatible API to connect other AI apps. |
 | **Agents** | Stable | Custom profiles with system prompts and themes. |
+| **Search (Web)** | Stable | Integrated Brave Search API for live internet access. |
+| **Multi-Chat** | Stable | Sidebar with independent sessions and auto-titling. |
 | **Memory** | Stable | Keyword search (BM25) and user profiles. |
 | **Schedules** | Stable | Automated tasks scheduled via CRON expressions. |
 | **Watchers** | Stable | Folder monitoring to trigger automatic actions. |
@@ -18,12 +20,12 @@ Reference of the current capabilities of the Python version of Orchestrator.
 | **Insights** | Stable | Logs for speed (tokens/s), latency, and inference success. |
 | **Workspace (IDE)** | Stable | Folder opening, file tree, and dynamic context. |
 | **Multi-Tab Editor**| Stable | Support for multiple files with tabs and highlighting. |
-| **Persistence** | Stable | Automatic session state saving (tabs, layout). |
+| **Persistence** | Stable | Full session state saving including chat history. |
+| **Temporal Data** | Stable | Awareness of current date, time, and OS environment. |
 | **VRAM Optimization**| Stable | Automatic model unloading on close to free up GPU. |
 | **Robust JSON** | Stable | Structural repair for truncated or malformed responses. |
 | **Settings** | Stable | Full management of profiles, models, and tools (`Ctrl+,`). |
-| **Dynamic Agents** | Stable | Create and edit multiple personalities with unique prompts. |
-| **Antigravity UI** | Stable | Premium "Deep Space" interface with cyan/purple accents and glow. |
+| **Antigravity UI** | Stable | Premium "Deep Space" interface with cyan/purple accents. |
 
 ---
 

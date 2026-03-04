@@ -7,8 +7,12 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 ## ✨ Features
 
 - **Agentic AI Core**: A ReAct-based agent that reasons, acts, and observes. It can create/edit files, list directories, and execute shell commands.
+- **Brave Search Integration**: Connected to the internet via Brave Search API. Use the agent to find latest docs, news, or technical solutions.
+- **Multi-Chat Support**: Manage multiple independent conversations with a dedicated sidebar. Switch contexts seamlessly.
+- **Automatic Chat Titling**: Chats are automatically named based on your first instruction, keeping your history organized.
 - **Dynamic Context Awareness**: The agent automatically receives a "snapshot" of your workspace, including file structure and active file content.
 - **Multi-Tab Editor**: Edit multiple files simultaneously with syntax highlighting, line numbers, and unsaved change detection (dirty indicators).
+- **Temporal Awareness**: The agent knows the current date, time, and OS environment.
 - **Workspace Management**: Open entire folders as projects. The file tree sidebar allows easy navigation and real-time filesystem monitoring via `watchdog`.
 - **Integrated Terminal**: Run commands directly within the editor with real-time output.
 - **Model Memory Optimization**: Automatically unloads models from GPU/RAM upon application closure, freeing up system resources.
