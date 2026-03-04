@@ -26,6 +26,7 @@ class AgentWorker(QThread):
 class AgentChatWidget(ChatView):
     file_created = pyqtSignal(str)
     command_run = pyqtSignal(str)
+    agent_event = pyqtSignal(str, str) # etype, content
 
     def __init__(self, workspace_manager, model_name: Optional[str] = None, parent=None):
         super().__init__(parent)
@@ -71,6 +72,9 @@ class AgentChatWidget(ChatView):
             self._add_bubble(content, "assistant")
         elif etype == "error":
             self._on_error(content)
+        
+        # Always emit to log panel
+        self.agent_event.emit(etype, str(content))
 
     def handle_agent_finished(self):
         self.input.setEnabled(True)

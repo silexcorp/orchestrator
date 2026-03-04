@@ -11,6 +11,7 @@ from ui.editor_widget import EditorWidget
 from ui.terminal_widget import TerminalWidget
 from ui.chat_widget import AgentChatWidget
 from ui.file_tree import FileTreeWidget
+from ui.log_panel import LogPanel
 from core.ollama_client import OllamaClient
 from core.workspace import WorkspaceManager
 from core.session import SessionManager
@@ -56,18 +57,30 @@ class MainWindow(QMainWindow):
         
         self.h_splitter.addWidget(self.editor_chat_splitter)
 
-        # Vertical Splitter to add Terminal at bottom
+        # Vertical Splitter for top/bottom
         self.v_splitter = QSplitter(Qt.Orientation.Vertical)
         self.v_splitter.addWidget(self.h_splitter)
+
+        # Sub-splitter for Terminal | Log Panel
+        self.bottom_splitter = QSplitter(Qt.Orientation.Horizontal)
         
         self.terminal = TerminalWidget(self.workspace_manager.get_root() or os.getcwd())
-        self.v_splitter.addWidget(self.terminal)
+        self.bottom_splitter.addWidget(self.terminal)
+        
+        self.log_panel = LogPanel()
+        self.bottom_splitter.addWidget(self.log_panel)
+        
+        self.v_splitter.addWidget(self.bottom_splitter)
         
         main_layout.addWidget(self.v_splitter)
 
-        # Initial sizes: Sidebar 200px, Rest 1000px; Editor/Chat splitting equal; Terminal 20%
+        # Connect agent events to log panel
+        self.chat.agent_event.connect(self.log_panel.append_log)
+
+        # Initial sizes: Sidebar 200px, Rest 1000px; Editor/Chat splitting equal; Terminal/Log 50/50; Bottom 25%
         self.h_splitter.setSizes([200, 1000])
         self.editor_chat_splitter.setSizes([600, 400])
+        self.bottom_splitter.setSizes([600, 400])
         self.v_splitter.setSizes([600, 200])
 
         # Status Bar

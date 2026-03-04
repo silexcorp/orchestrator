@@ -30,7 +30,7 @@ La aplicación está dividida en tres capas principales:
 
 1. **Modelos (`orchestrator/models/`)**: Definiciones de datos compartidas (Agentes, Sesiones, Proveedores).
 2. **Core (`core/`)**: Lógica de negocio, servicios de inferencia, gestión de workspaces (`workspace.py`) y persistencia (`session.py`).
-3. **UI (`ui/`)**: Interfaz gráfica construida con PyQt6, incluyendo el `EditorWidget` (tabs) y `FileTreeWidget`.
+| 3. **UI (`ui/`)**: Interfaz gráfica construida con PyQt6, incluyendo el `EditorWidget` (tabs), `FileTreeWidget` y el nuevo `LogPanel`. Ver [Diseño Antigravity](ANTIGRAVITY_DESIGN.md).
 
 ---
 
