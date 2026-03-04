@@ -195,11 +195,18 @@ class MainWindow(QMainWindow):
             self._open_workspace(path)
 
     def _open_workspace(self, path):
+        # Refresh Start: Close files and chats
+        if not self.editor.close_all_tabs():
+            return # User cancelled
+            
+        self.chat.clear_session()
+        
         self.workspace_manager.open_folder(path)
         self.file_tree.set_root(path)
         self.terminal.process.setWorkingDirectory(path)
         self.session_manager.add_recent_workspace(path)
         self._update_recent_menu()
+        self._save_session()
         self.statusBar().showMessage(f"Workspace: {path}")
 
     def _on_file_selected(self, path):

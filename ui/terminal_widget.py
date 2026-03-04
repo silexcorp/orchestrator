@@ -63,6 +63,9 @@ class TerminalWidget(QWidget):
         self.run_command(cmd)
 
     def run_command(self, cmd: str):
+        if not cmd or not cmd.strip():
+            return
+            
         if self.process.state() == QProcess.ProcessState.Running:
             self.append_text("Process already running. Wait or stop it.\n", "#f85149")
             return

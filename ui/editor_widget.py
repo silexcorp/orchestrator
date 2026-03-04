@@ -181,8 +181,14 @@ class EditorWidget(QTabWidget):
         QShortcut(QKeySequence("Ctrl+Tab"), self, self.next_tab)
 
     def close_active_tab(self):
-        idx = self.currentIndex()
-        if idx >= 0: self.close_tab(idx)
+        self.close_tab(self.currentIndex())
+
+    def close_all_tabs(self):
+        """Close all open tabs, asking for save if needed."""
+        while self.count() > 0:
+            if not self.close_tab(0):
+                return False # User cancelled
+        return True
 
     def next_tab(self):
         count = self.count()
@@ -222,17 +228,19 @@ class EditorWidget(QTabWidget):
                 break
 
     def close_tab(self, index):
+        if index < 0: return True
         editor = self.widget(index)
         if editor.dirty:
-            res = QMessageBox.question(self, "Guardar cambios", 
-                                     f"¿Deseas guardar los cambios en {os.path.basename(editor.file_path)}?",
+            res = QMessageBox.question(self, "Save changes", 
+                                     f"Do you want to save changes in {os.path.basename(editor.file_path)}?",
                                      QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
             if res == QMessageBox.StandardButton.Save:
                 self.save_file(index)
             elif res == QMessageBox.StandardButton.Cancel:
-                return
+                return False
         
         self.removeTab(index)
+        return True
 
     def save_file(self, index=None):
         if index is None or isinstance(index, bool):
