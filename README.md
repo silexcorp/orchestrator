@@ -50,11 +50,22 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
    ```
    *Note: Ensure `PyQt6`, `ollama`, and `watchdog` are installed.*
 
-### Running the Editor
+### Running the Editor (Development)
 
 ```bash
 ./venv/bin/python3 main.py
 ```
+
+### 📦 Building the Executable
+
+You can generate a standalone executable for Linux using the provided build script:
+
+```bash
+chmod +x build_executable.sh
+./build_executable.sh
+```
+
+The resulting binary will be located in the `dist/` folder as `Orchestrator`.
 
 ## 🛠️ Architecture
 
