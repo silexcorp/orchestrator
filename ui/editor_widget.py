@@ -235,10 +235,14 @@ class EditorWidget(QTabWidget):
         self.removeTab(index)
 
     def save_file(self, index=None):
-        if index is None: index = self.currentIndex()
+        if index is None or isinstance(index, bool):
+            index = self.currentIndex()
+        
         if index < 0: return
         
         editor = self.widget(index)
+        if not editor: return
+        
         if not editor.file_path:
             path, _ = QFileDialog.getSaveFileName(self, "Guardar como")
             if path:
