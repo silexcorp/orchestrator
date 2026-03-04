@@ -77,6 +77,9 @@ class MainWindow(QMainWindow):
 
         # Connect agent events to log panel
         self.chat.agent_event.connect(self.log_panel.append_log)
+        
+        # Connect agent terminal commands to terminal widget
+        self.chat.command_run.connect(self.terminal.run_command)
 
         # Initial sizes: Sidebar 200px, Rest 1000px; Editor/Chat splitting equal; Terminal/Log 50/50; Bottom 25%
         self.h_splitter.setSizes([200, 1000])

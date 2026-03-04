@@ -61,6 +61,11 @@ class Agent:
 
                 # Execute tool
                 observation = self._execute_tool(action, params)
+                
+                # Truncate observation to prevent context bloat
+                if len(observation) > 2000:
+                    observation = observation[:2000] + "\n... (output truncated for brevity) ..."
+                
                 yield {"type": "observation", "content": observation}
 
                 # Add step to history
