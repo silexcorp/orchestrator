@@ -1,4 +1,6 @@
 import json
+import os
+import re
 from typing import Optional
 from PyQt6.QtCore import QThread, pyqtSignal, Qt, QTimer
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame
@@ -254,15 +256,25 @@ class AgentChatWidget(QWidget): # Changed from ChatView to QWidget to hold sideb
 
     def handle_agent_finished(self):
         self.chat_view.set_busy(False)
-        # Auto-update title if it's the first turn
-        if len(self.agent.history) >= 2:
+        
+        # Auto-update title if it's currently "New Chat" and we have history
+        should_refresh_title = False
+        if self.current_chat_id:
+            chat_data = self.session_manager.load_chat(self.current_chat_id)
+            if chat_data and chat_data.get("title") == "New Chat" and len(self.agent.history) >= 1:
+                should_refresh_title = True
+        
+        if should_refresh_title or len(self.agent.history) >= 2:
             self.session_manager.save_chat(self.current_chat_id, self.agent.history)
+            
             # Update sidebar item title
             for i in range(self.chat_list.count()):
                 item = self.chat_list.item(i)
                 if item.data(Qt.ItemDataRole.UserRole) == self.current_chat_id:
-                    chat_data = self.session_manager.load_chat(self.current_chat_id)
-                    item.setText(chat_data.get("title", "Updated Chat"))
+                    # Reload data to get the newly generated title
+                    updated_data = self.session_manager.load_chat(self.current_chat_id)
+                    if updated_data:
+                        item.setText(updated_data.get("title", "Updated Chat"))
                     break
 
     def handle_agent_error(self, err_msg: str):

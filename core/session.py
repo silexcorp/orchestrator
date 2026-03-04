@@ -73,17 +73,28 @@ class SessionManager:
         import time
         path = os.path.join(self.chats_dir, f"{chat_id}.json")
         
-        # Try to keep existing title if not provided
-        if not title and os.path.exists(path):
+        # Determine best title
+        current_title = title
+        if not current_title and os.path.exists(path):
             try:
                 with open(path, 'r') as f:
                     old_data = json.load(f)
-                    title = old_data.get("title")
+                    current_title = old_data.get("title")
             except: pass
-            
+
+        # If we still have no title or it's the placeholder, try to extract from history
+        if history and (not current_title or current_title == "New Chat"):
+            first_msg = history[0].get("content", "")
+            # Clean up: strip, first line only, limit length
+            clean_title = first_msg.split('\n')[0].strip()
+            if len(clean_title) > 35:
+                clean_title = clean_title[:32] + "..."
+            if clean_title:
+                current_title = clean_title
+
         data = {
             "id": chat_id,
-            "title": title or (history[0]["content"][:30] + "..." if history else "New Chat"),
+            "title": current_title or "New Chat",
             "history": history,
             "updated_at": time.time()
         }
