@@ -51,16 +51,30 @@ class MessageBubble(QWidget):
         layout.setContentsMargins(16, 8 if self._role != "user" else 4, 16, 4)
         layout.setSpacing(4)
 
-        # Role label
-        role_label = QLabel("You" if self._role == "user" else "🦕 Orchestrator")
-        role_label.setObjectName("roleName")
+        # Antigravity Minimal Role label
+        role_label = QLabel("YOU" if self._role == "user" else "ANTIGRAVITY")
+        role_label.setStyleSheet(f"font-weight: bold; color: {'#00f2ff' if self._role != 'user' else '#8a2be2'}; font-size: 10px; letter-spacing: 2px;")
         if self._role == "user":
             role_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         layout.addWidget(role_label)
 
         # Bubble
         self.bubble = QLabel()
-        self.bubble.setObjectName("userBubble" if self._role == "user" else "aiBubble")
+        if self._role == "user":
+            self.bubble.setStyleSheet("""
+                background-color: rgba(138, 43, 226, 0.1);
+                color: #e0e6ed;
+                border-radius: 20px;
+                padding: 12px 18px;
+                border: 1px solid rgba(138, 43, 226, 0.3);
+            """)
+        else:
+            self.bubble.setStyleSheet("""
+                background-color: transparent;
+                color: #f0f4f8;
+                padding: 10px 4px;
+            """)
+        
         self.bubble.setWordWrap(True)
         self.bubble.setTextFormat(Qt.TextFormat.RichText)
         self.bubble.setOpenExternalLinks(True)
@@ -75,9 +89,9 @@ class MessageBubble(QWidget):
         row.setSpacing(0)
         if self._role == "user":
             row.addStretch(1)
-            row.addWidget(self.bubble, 2)
+            row.addWidget(self.bubble, 8) # Increased stretch for bubble
         else:
-            row.addWidget(self.bubble, 3)
+            row.addWidget(self.bubble, 10) # Increased stretch for bubble
             row.addStretch(1)
         layout.addLayout(row)
 
@@ -152,33 +166,59 @@ class ChatView(QWidget):
         root.addWidget(self.scroll, 1)
 
         # ── Input area ─────────────────────────────────────────────────────
-        input_area = QWidget()
-        input_area.setObjectName("inputArea")
-        inp_layout = QHBoxLayout(input_area)
-        inp_layout.setContentsMargins(16, 12, 16, 16)
+        # Main input container (centered capsule)
+        input_container = QWidget()
+        input_container_layout = QHBoxLayout(input_container)
+        input_container_layout.setContentsMargins(16, 8, 16, 24)
+        input_container_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.input_frame = QFrame()
+        self.input_frame.setObjectName("inputArea")
+        self.input_frame.setStyleSheet("""
+            QFrame#inputArea {
+                background-color: #0d0f17;
+                border: 1px solid rgba(0, 242, 255, 0.2);
+                border-radius: 28px;
+            }
+            QFrame#inputArea:focus-within {
+                border: 1px solid #00f2ff;
+                background-color: #11131e;
+            }
+        """)
+        # Remove setFixedWidth to allow expansion to container width
+        self.input_frame.setMaximumWidth(1200) # Optional: sanity limit for very wide screens
+        self.input_frame.setMinimumHeight(56)
+        
+        inp_layout = QHBoxLayout(self.input_frame)
+        inp_layout.setContentsMargins(20, 4, 8, 4)
         inp_layout.setSpacing(10)
 
         self.input = _StreamInputField()
         self.input.setObjectName("inputField")
-        self.input.setPlaceholderText("Ask Orchestrator anything…")
-        self.input.setFixedHeight(52)
-        self.input.setMaximumHeight(120)
+        self.input.setStyleSheet("background: transparent; border: none; padding: 12px 0; color: #f0f4f8;")
+        self.input.setPlaceholderText("Direct Command to Antigravity...")
+        self.input.setFixedHeight(50)
+        self.input.setMaximumHeight(200)
         inp_layout.addWidget(self.input, 1)
 
-        self.send_btn = QPushButton("Send ↵")
+        self.send_btn = QPushButton("✦")
         self.send_btn.setObjectName("sendBtn")
+        self.send_btn.setFixedSize(40, 40)
         self.send_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.send_btn.setToolTip("Ignite Thought (Enter)")
         self.send_btn.clicked.connect(self._on_send)
         inp_layout.addWidget(self.send_btn)
 
-        self.stop_btn = QPushButton("■ Stop")
+        self.stop_btn = QPushButton("■")
         self.stop_btn.setObjectName("stopBtn")
+        self.stop_btn.setFixedSize(36, 36)
         self.stop_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.stop_btn.clicked.connect(self._on_stop)
         self.stop_btn.hide()
         inp_layout.addWidget(self.stop_btn)
 
-        root.addWidget(input_area)
+        input_container_layout.addWidget(self.input_frame)
+        root.addWidget(input_container)
 
     def _build_welcome(self) -> QWidget:
         w = QWidget()

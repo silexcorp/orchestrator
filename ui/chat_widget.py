@@ -83,9 +83,15 @@ class AgentChatWidget(ChatView):
 
     def add_thought_bubble(self, content):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #161b22; border-radius: 8px; border: 1px solid #30363d; margin: 4px; padding: 4px;")
+        bubble.setStyleSheet("""
+            background-color: #0a0b10;
+            border-radius: 16px;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            margin: 10px 24px;
+            padding: 14px;
+        """)
         layout = QVBoxLayout(bubble)
-        label = QLabel(f"<b>🧠 Pensamiento</b><br><span style='color: #8b949e;'>{content}</span>")
+        label = QLabel(f"<span style='color: #8a2be2; font-size: 10px; font-weight: bold; letter-spacing: 2px;'>✦ NEURAL THOUGHT</span><br><span style='color: #b4b4b4; line-height: 1.4;'>{content}</span>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
@@ -94,10 +100,16 @@ class AgentChatWidget(ChatView):
 
     def add_action_bubble(self, action, params):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #d29922; border-radius: 8px; color: #0d1117; margin: 4px; padding: 4px;")
+        bubble.setStyleSheet("""
+            background-color: rgba(0, 242, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            margin: 10px 24px;
+            padding: 14px;
+        """)
         layout = QVBoxLayout(bubble)
         param_str = json.dumps(params, indent=2)
-        label = QLabel(f"⚙️ <b>Ejecutando: {action}</b><br><pre style='font-size: 10px;'>{param_str}</pre>")
+        label = QLabel(f"<span style='color: #00f2ff; font-size: 10px; font-weight: bold; letter-spacing: 2px;'>⚙️ EXECUTING: {action.upper()}</span><br><pre style='color: #8a2be2; font-family: monospace; font-size: 11px;'>{param_str}</pre>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
@@ -106,11 +118,17 @@ class AgentChatWidget(ChatView):
 
     def add_observation_bubble(self, content):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #238636; border-radius: 8px; color: white; margin: 4px; padding: 4px;")
+        bubble.setStyleSheet("""
+            background-color: #05060a;
+            border-radius: 16px;
+            border: 1px solid rgba(35, 134, 54, 0.3);
+            margin: 10px 24px;
+            padding: 14px;
+        """)
         layout = QVBoxLayout(bubble)
         # Truncate long observations
         display_content = (content[:500] + '...') if len(content) > 500 else content
-        label = QLabel(f"👁️ <b>Observación</b><br><pre style='font-size: 10px;'>{display_content}</pre>")
+        label = QLabel(f"<span style='color: #238636; font-size: 10px; font-weight: bold; letter-spacing: 2px;'>👁️ SENSOR DATA</span><br><pre style='color: #8b949e; font-family: monospace; font-size: 11px;'>{display_content}</pre>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
