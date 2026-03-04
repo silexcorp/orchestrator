@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
             self.model_combo.setCurrentIndex(0)
 
     def _on_model_changed(self, model_name):
-        self.chat.agent.ollama.model = model_name
+        self.chat.agent.set_model(model_name)
 
     def _show_settings(self):
         diag = SettingsDialog(self)

@@ -2,7 +2,7 @@ import json
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QTabWidget, QWidget,
     QLabel, QLineEdit, QTextEdit, QPushButton, QListWidget,
-    QListWidgetItem, QMessageBox, QCheckBox, QFormLayout
+    QListWidgetItem, QMessageBox, QCheckBox, QFormLayout, QRadioButton, QButtonGroup
 )
 from PyQt6.QtCore import Qt
 from core.config import ConfigManager
@@ -20,9 +20,10 @@ class SettingsDialog(QDialog):
         
         self.tabs = QTabWidget()
         self.tabs.addTab(self._create_agents_tab(), "Agents")
-        self.tabs.addTab(self._create_models_tab(), "Models")
+        self.tabs.addTab(self._create_models_tab(), "Local Models")
+        self.tabs.addTab(self._create_providers_tab(), "AI Providers")
         self.tabs.addTab(self._create_tools_tab(), "Tools")
-        self.tabs.addTab(self._create_search_tab(), "Search")
+        self.tabs.addTab(self._create_search_tab(), "Search APIs")
         
         layout.addWidget(self.tabs)
         
@@ -86,6 +87,41 @@ class SettingsDialog(QDialog):
         layout.addRow("Ollama Endpoint:", self.ollama_url)
         
         layout.addWidget(QLabel("\n* Available models are automatically listed in the main toolbar."))
+        return tab
+
+    def _create_providers_tab(self):
+        tab = QWidget()
+        layout = QFormLayout(tab)
+        
+        self.gemini_api_key = QLineEdit(self.config_manager.config.get("gemini_api_key", ""))
+        self.gemini_api_key.setEchoMode(QLineEdit.EchoMode.Password)
+        self.gemini_api_key.setPlaceholderText("Enter Google Gemini API Key...")
+        
+        self.remote_model = QLineEdit(self.config_manager.config.get("remote_model", "gemini-2.0-flash"))
+        
+        # Provider Selection
+        provider_layout = QHBoxLayout()
+        self.provider_group = QButtonGroup(self)
+        self.ollama_radio = QRadioButton("Ollama (Local)")
+        self.gemini_radio = QRadioButton("Google Gemini (Cloud)")
+        
+        preferred = self.config_manager.config.get("preferred_provider", "ollama")
+        self.ollama_radio.setChecked(preferred == "ollama")
+        self.gemini_radio.setChecked(preferred == "gemini")
+        
+        self.provider_group.addButton(self.ollama_radio)
+        self.provider_group.addButton(self.gemini_radio)
+        provider_layout.addWidget(self.ollama_radio)
+        provider_layout.addWidget(self.gemini_radio)
+        
+        layout.addRow("Active Provider:", provider_layout)
+        layout.addRow("Gemini API Key:", self.gemini_api_key)
+        layout.addRow("Remote Model:", self.remote_model)
+        
+        help_text = QLabel("\nSelect your preferred 'brain'. Gemini requires an API key.\nDefault: gemini-2.0-flash")
+        help_text.setStyleSheet("color: #8b949e; font-size: 11px;")
+        layout.addWidget(help_text)
+        
         return tab
 
     def _create_search_tab(self):
@@ -168,6 +204,9 @@ class SettingsDialog(QDialog):
         # Update other tabs
         self.config_manager.config["ollama_url"] = self.ollama_url.text()
         self.config_manager.config["brave_api_key"] = self.brave_api_key.text()
+        self.config_manager.config["gemini_api_key"] = self.gemini_api_key.text()
+        self.config_manager.config["remote_model"] = self.remote_model.text()
+        self.config_manager.config["preferred_provider"] = "gemini" if self.gemini_radio.isChecked() else "ollama"
         
         for tool_id, check in self.tool_checks.items():
             self.config_manager.config["tools"][tool_id] = check.isChecked()

@@ -5,6 +5,9 @@ from typing import Dict, List, Any, Optional
 DEFAULT_CONFIG = {
     "ollama_url": "http://localhost:11434",
     "brave_api_key": "",
+    "gemini_api_key": "",
+    "remote_model": "gemini-2.0-flash",
+    "preferred_provider": "ollama",
     "agents": [
         {
             "id": "default",

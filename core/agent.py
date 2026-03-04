@@ -3,22 +3,35 @@ import re
 import os
 from typing import Generator, List, Dict, Any, Optional
 from .ollama_client import OllamaClient
+from .gemini_client import GeminiClient
 from .tools import ToolExecutor
 from .config import ConfigManager
 
 class Agent:
     def __init__(self, workspace_manager, model: Optional[str] = None):
         self.config_manager = ConfigManager()
-        self.ollama = OllamaClient(model)
         self.workspace_manager = workspace_manager
         self.tools = ToolExecutor(workspace_manager.get_root())
         self.history: List[Dict[str, str]] = []
         self.max_steps = 10
+        self.model = model
 
         # Load active agent configuration
         agent_conf = self.config_manager.get_active_agent()
         self.system_prompt = agent_conf.get("prompt", "")
         self.name = agent_conf.get("name", "Agent")
+
+    def set_model(self, model_name: str):
+        self.model = model_name
+
+    def _get_provider(self):
+        conf = self.config_manager.config
+        gemini_key = conf.get("gemini_api_key")
+        preferred = conf.get("preferred_provider", "ollama")
+        
+        if preferred == "gemini" and gemini_key and gemini_key.strip():
+            return GeminiClient(gemini_key, conf.get("remote_model", "gemini-2.0-flash"))
+        return OllamaClient(self.model)
 
     def clear_history(self):
         self.history = []
@@ -32,6 +45,8 @@ class Agent:
         self.system_prompt = agent_conf.get("prompt", "")
         self.name = agent_conf.get("name", "Agent")
 
+        provider = self._get_provider()
+
         # Sync workspace path
         root = self.workspace_manager.get_root()
         if root:
@@ -44,12 +59,13 @@ class Agent:
         dynamic_system_prompt = self.system_prompt + "\n---\n" + context
 
         # Yield initial thinking state
-        yield {"type": "thought", "content": "Consultando a Ollama..."}
+        provider_name = "Gemini" if isinstance(provider, GeminiClient) else "Ollama"
+        yield {"type": "thought", "content": f"Consultando a {provider_name}..."}
 
         for step in range(self.max_steps):
             full_response = ""
-            # Stream the agent's thought/action from Ollama
-            for chunk in self.ollama.chat_stream(self.history, system=dynamic_system_prompt):
+            # Stream the agent's thought/action from provider
+            for chunk in provider.chat_stream(self.history, system=dynamic_system_prompt):
                 full_response += chunk
 
             # Clean and repair JSON
