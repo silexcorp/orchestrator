@@ -72,6 +72,7 @@ class ConfigManager:
                             agent["prompt"] = DEFAULT_CONFIG["agents"][0]["prompt"]
                             print("Updated default agent prompt to latest version.")
 
+                self.config = data
                 return data
         except Exception as e:
             print(f"Error loading config: {e}")
