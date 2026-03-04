@@ -14,10 +14,16 @@ class AgentWorker(QThread):
         super().__init__()
         self.agent = agent
         self.user_input = user_input
+        self._is_running = True
+
+    def stop(self):
+        self._is_running = False
 
     def run(self):
         try:
             for event in self.agent.run(self.user_input):
+                if not self._is_running:
+                    break
                 self.event_received.emit(event)
             self.finished.emit("Done")
         except Exception as e:
@@ -36,17 +42,22 @@ class AgentChatWidget(ChatView):
 
     def _submit_text(self, text: str) -> None:
         """Override to start the agent instead of normal streaming."""
+        # Use existing bubble adding logic but ensure state is busy
         self._add_bubble(text, "user")
         self.welcome_widget.setVisible(False)
         self.scroll.setVisible(True)
         
-        self.input.setEnabled(False)
-        self.send_btn.setEnabled(False)
+        # UI state using the new set_busy
+        self.set_busy(True)
 
         self.worker = AgentWorker(self.agent, text)
         self.worker.event_received.connect(self.handle_agent_event)
         self.worker.finished.connect(self.handle_agent_finished)
         self.worker.error.connect(self.handle_agent_error)
+        
+        # Connect stop request from ChatView
+        self.stop_requested.connect(self.worker.stop)
+        
         self.worker.start()
 
     def handle_agent_event(self, event: dict):
@@ -77,15 +88,14 @@ class AgentChatWidget(ChatView):
         self.agent_event.emit(etype, str(content))
 
     def handle_agent_finished(self):
-        self.input.setEnabled(True)
-        self.send_btn.setEnabled(True)
-        self.input.setFocus()
+        self.set_busy(False)
 
     def handle_agent_error(self, err_msg: str):
         self._on_error(err_msg)
         self.handle_agent_finished()
 
     def add_thought_bubble(self, content):
+        # ... stays the same ...
         bubble = QFrame()
         bubble.setStyleSheet("""
             background-color: #0a0b10;
@@ -103,6 +113,7 @@ class AgentChatWidget(ChatView):
         QTimer.singleShot(50, self._scroll_bottom)
 
     def add_action_bubble(self, action, params):
+        # ... stays the same ...
         bubble = QFrame()
         bubble.setStyleSheet("""
             background-color: rgba(0, 242, 255, 0.05);
@@ -121,6 +132,7 @@ class AgentChatWidget(ChatView):
         QTimer.singleShot(50, self._scroll_bottom)
 
     def add_observation_bubble(self, content):
+        # ... stays the same ...
         bubble = QFrame()
         bubble.setStyleSheet("""
             background-color: #05060a;
