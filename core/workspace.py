@@ -58,9 +58,9 @@ class WorkspaceManager:
         if self.active_file_path:
             snapshot += "\nCONTENIDO DEL ARCHIVO ACTIVO:\n"
             snapshot += "```python\n"
-            # Limit content to first 300 lines for the active file
-            lines = self.active_file_content.splitlines()[:300]
-            snapshot += "\n".join(lines) + ("\n..." if len(self.active_file_content.splitlines()) > 300 else "")
+            # Limit content to first 1000 lines for the active file
+            lines = self.active_file_content.splitlines()[:1000]
+            snapshot += "\n".join(lines) + ("\n..." if len(self.active_file_content.splitlines()) > 1000 else "")
             snapshot += "\n```\n"
         
         # Add relevant small files (context)
@@ -70,7 +70,7 @@ class WorkspaceManager:
             full_path = os.path.join(self.root_path, rf)
             try:
                 with open(full_path, 'r', encoding='utf-8') as f:
-                    content = f.read().splitlines()[:100] # Limit to 100 lines
+                    content = f.read().splitlines()[:500] # Limit to 500 lines
                     snapshot += f"--- {rf} ---\n"
                     snapshot += "\n".join(content) + "\n"
             except:

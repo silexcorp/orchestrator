@@ -98,3 +98,6 @@ The resulting binary will be located in the `dist/` folder as `Orchestrator`.
 ## 📄 License
 
 GPL-3.0 License. See `LICENSE` for details.
+
+---
+We are Okan Team

@@ -103,10 +103,26 @@ class ToolExecutor:
             with open(full_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            if old not in content:
-                return f"Error: Could not find exact match for text to replace in {path}"
+            # Robust matching: try exact match first
+            if old in content:
+                new_content = content.replace(old, new, 1)
+            else:
+                # Try matching without leading/trailing whitespace in 'old'
+                stripped_old = old.strip()
+                if stripped_old and stripped_old in content:
+                    # Find the actual chunk including its surrounding whitespace
+                    # This is a bit complex, but let's try a simpler approach for now:
+                    # If stripped version matches exactly once, we can use it.
+                    occurrences = content.count(stripped_old)
+                    if occurrences == 1:
+                        new_content = content.replace(stripped_old, new, 1)
+                    else:
+                        return f"Error: Could not find exact match for text to replace in {path}. " \
+                               f"Multiple similar matches found ({occurrences}), be more specific."
+                else:
+                    return f"Error: Could not find exact match for text to replace in {path}. " \
+                           f"Make sure you copied the block EXACTLY as it appears in the file."
             
-            new_content = content.replace(old, new, 1) # Replace first occurrence
             with open(full_path, 'w', encoding='utf-8') as f:
                 f.write(new_content)
             return f"File {path} edited successfully"
@@ -123,6 +139,40 @@ class ToolExecutor:
                 return f.read()
         except Exception as e:
             return f"Error reading file: {str(e)}"
+
+    def grep_search(self, query: str) -> str:
+        """Search for a string across all files in the workspace (ignoring common junk folders)."""
+        if not self.workspace_path:
+            return "Error: No workspace opened."
+        
+        ignored_dirs = {'.git', 'venv', '.venv', '__pycache__', 'node_modules', 'dist', 'build'}
+        results = []
+        
+        try:
+            for root, dirs, files in os.walk(self.workspace_path):
+                # Efficiently skip ignored directories
+                dirs[:] = [d for d in dirs if d not in ignored_dirs]
+                
+                for filename in files:
+                    full_path = os.path.join(root, filename)
+                    rel_path = os.path.relpath(full_path, self.workspace_path)
+                    
+                    try:
+                        with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                            for line_num, line in enumerate(f, 1):
+                                if query in line:
+                                    results.append(f"{rel_path}:{line_num}: {line.strip()}")
+                                    if len(results) > 100:
+                                        return "\n".join(results) + "\n... (Too many results, showing first 100)"
+                    except Exception:
+                        continue # Skip binary or unreadable files
+                        
+            if not results:
+                return f"No occurrences of '{query}' found in workspace."
+            return "\n".join(results)
+            
+        except Exception as e:
+            return f"Error during grep search: {str(e)}"
 
     def run_command(self, command: str) -> str:
         try:

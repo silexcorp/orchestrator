@@ -89,9 +89,9 @@ class Agent:
                 # Execute tool
                 observation = self._execute_tool(action, params)
                 
-                # Truncate observation to prevent context bloat
-                if len(observation) > 2000:
-                    observation = observation[:2000] + "\n... (output truncated for brevity) ..."
+                # Truncate observation to prevent extreme context bloat
+                if len(observation) > 50000:
+                    observation = observation[:50000] + "\n... (output truncated for brevity. File is very large) ..."
                 
                 yield {"type": "observation", "content": observation}
 
@@ -299,12 +299,16 @@ class Agent:
             return self.tools.create_file(params.get("path"), params.get("content", ""))
         elif action == "edit_file":
             return self.tools.edit_file(params.get("path"), params.get("old", ""), params.get("new", ""))
+        elif action == "grep_search":
+            return self.tools.grep_search(params.get("query", ""))
         elif action == "read_file":
             return self.tools.read_file(params.get("path"))
         elif action == "list_files" or action == "search_files":
             return self.tools.search_files(params.get("pattern", "*"))
         elif action == "get_system_info":
             return self.tools.get_system_info()
+        elif action == "run_command":
+            return self.tools.run_command(params.get("command", ""))
         elif action == "search_web":
             api_key = self.config_manager.config.get("brave_api_key", "")
             query = params.get("query") or params.get("q", "")
