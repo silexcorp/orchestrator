@@ -12,9 +12,9 @@ Los Agentes de Orchestrator permiten la ejecución de tareas complejas de forma 
 
 ### Directorio de Trabajo
 Antes de que un agente realice operaciones de archivos:
-1. Haz clic en **Select Folder**.
+1. Haz clic en **Archivo -> Abrir Carpeta** (`Ctrl+Shift+O`).
 2. Elige el directorio raíz de tu proyecto.
-Orchestrator solo podrá leer y escribir archivos dentro de este directorio seleccionado.
+El `WorkspaceManager` se encargará de establecer la raíz y el agente recibirá automáticamente un **snapshot** de la estructura del proyecto y el contenido del archivo activo para actuar con contexto completo.
 
 ---
 
@@ -34,7 +34,7 @@ Las tareas se desglosan en "Issues" (pendientes, en progreso, bloqueadas, cerrad
 
 ## Herramientas Disponibles
 
-- **Archivos**: `file_read`, `file_edit`, `file_write`, `file_search`, `file_tree`.
+- **Archivos**: `file_read`, `file_edit`, `file_write`, `file_search`, `file_tree`, `list_files`.
 - **Sistema**: `shell_run` (requiere aprobación si es comando destructivo), `dir_create`.
 - **Git**: `git_status`, `git_diff`, `git_commit`.
 

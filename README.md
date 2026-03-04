@@ -1,72 +1,78 @@
-# Orchestrator (Linux)
+# Orchestrator AI Code Editor 🦕
 
-Orchestrator es un runtime de IA ligero y potente para Linux, reimplementado en Python para ofrecer una experiencia nativa y fluida. Permite ejecutar modelos locales y remotos, automatizar tareas mediante agentes y exponer herramientas a través del protocolo MCP.
+Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 and powered by Ollama. It provides a seamless development experience with an integrated AI agent capable of understanding project context, editing files, and running terminal commands.
 
-Reimplementado de Swift a Python con PyQt6 y Ollama.
+![Screenshot](https://via.placeholder.com/800x450.png?text=Orchestrator+AI+Editor+Interface) *Placeholder for actual screenshot*
 
-<img src="https://github.com/silexcorp/orchestrator/blob/master/screenshot/page.png" width="900">
+## ✨ Features
 
-## Características principales
+- **Agentic AI Core**: A ReAct-based agent that reasons, acts, and observes. It can create/edit files, list directories, and execute shell commands.
+- **Dynamic Context Awareness**: The agent automatically receives a "snapshot" of your workspace, including file structure and active file content.
+- **Multi-Tab Editor**: Edit multiple files simultaneously with syntax highlighting, line numbers, and unsaved change detection (dirty indicators).
+- **Workspace Management**: Open entire folders as projects. The file tree sidebar allows easy navigation and real-time filesystem monitoring via `watchdog`.
+- **Integrated Terminal**: Run commands directly within the editor with real-time output.
+- **Session Persistence**: Automatically restores your last workspace, open tabs, window layout, and preferred Ollama model.
+- **Modern Dark Theme**: High-contrast UI inspired by GitHub's dark mode.
+- **Model Selector**: Switch between local Ollama models on the fly.
 
-- **Inferencia Local con Ollama** — Soporte para Llama, Qwen, Gemma, Mistral y más.
-- **Proveedores Remotos** — Conexión nativa a Anthropic, OpenAI, OpenRouter u otros proveedores compatibles con OpenAI.
-- **Servidor MCP** — Expone herramientas a agentes de IA mediante el Model Context Protocol.
-- **Interfaz Premium** — UI moderna construida con PyQt6, optimizada para Linux.
-- **Automatización**:
-    - **Schedules**: Tareas programadas por tiempo (CRON).
-    - **Watchers**: Monitoreo de carpetas con disparadores automáticos.
-    - **Skills**: Importación de capacidades de IA en Markdown.
-- **Memoria Persistente**: Perfil de usuario, memoria de trabajo y búsqueda BM25.
+## 🚀 Getting Started
 
-## Requisitos
+### Prerequisites
 
-- **Linux** (Probado en Ubuntu 24.04+)
 - **Python 3.10+**
-- **Ollama** (`ollama serve` debe estar corriendo)
+- **Ollama**: [Install Ollama](https://ollama.ai/download) and ensure it's running (`ollama serve`).
+- **Required Models**: We suggest `qwen2.5-coder:7b` or `qwen3.5:9b`.
 
-## Instalación
+### Installation
 
-Orchestrator utiliza un entorno virtual para evitar conflictos con el sistema:
+1. Clone the repository:
+   ```bash
+   git clone <repo-url>
+   cd orchestrator
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Note: Ensure `PyQt6`, `ollama`, and `watchdog` are installed.*
+
+### Running the Editor
 
 ```bash
-# Entrar al directorio
-cd orchestrator
-
-# Crear el entorno virtual
-python3 -m venv venv
-
-# Instalar dependencias
-./venv/bin/pip install -r requirements.txt
+./venv/bin/python3 main.py
 ```
 
-## Ejecución
+## 🛠️ Architecture
 
-Para lanzar la aplicación:
+- **`core/`**:
+  - `agent.py`: The AI brain (ReAct loop).
+  - `tools.py`: File and command execution tools.
+  - `workspace.py`: Context snapshot and file management.
+  - `session.py`: JSON-based state persistence.
+  - `ollama_client.py`: Wrapper for the Ollama API.
+- **`ui/`**:
+  - `main_window.py`: Layout integration and signal orchestration.
+  - `editor_widget.py`: Tabbed code editor with syntax highlighting.
+  - `file_tree.py`: Sidebar for project navigation.
+  - `chat_widget.py`: Specialized chat with thought/action/observation bubbles.
+  - `terminal_widget.py`: Integrated shell access.
 
-```bash
-cd ..
-./orchestrator/venv/bin/python3 -m orchestrator.main
-```
+## ⌨️ Shortcuts
 
-## Configuración
+- `Ctrl+S`: Save current file.
+- `Ctrl+Shift+O`: Open folder (Workspace).
+- `Ctrl+W`: Close current tab.
+- `Ctrl+Tab`: Switch between tabs.
+- `Enter`: Send message in chat.
+- `Shift+Enter`: New line in chat.
 
-Los datos y la configuración se guardan en `~/.config/orchestrator/`:
-- `agents.json`: Configuración de asistentes.
-- `providers.json`: API Keys y endpoints remotos.
-- `sessions.json`: Historial de chats.
-- `insights.json`: Logs de rendimiento.
-- `skills/`: Habilidades personalizadas en Markdown.
+## 📄 License
 
----
-
-## Documentación Detallada
-
-- [Funcionalidades](docs/FEATURES.md)
-- [Guía de Configuración](docs/SHARED_CONFIGURATION_GUIDE.md)
-- [Memoria y Contexto](docs/MEMORY.md)
-- [Automatización (Watchers)](docs/WATCHERS.md)
-- [Trabajo con Agentes (Work)](docs/WORK.md)
-
----
-
-We are Okan.
+GPL-3.0 License. See `LICENSE` for details.

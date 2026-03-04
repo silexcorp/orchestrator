@@ -16,6 +16,9 @@ Referencia de las capacidades actuales de la versión Python de Orchestrator.
 | **Skills** | Estable | Importación de lógica de IA desde archivos Markdown. |
 | **Work Mode** | Estable | Orquestador de tareas multi-paso (Agentes autónomos). |
 | **Insights** | Estable | Registro de velocidad (tokens/s), latencia y éxito de inferencia. |
+| **Workspace (IDE)** | Estable | Apertura de carpetas, árbol de archivos y contexto dinámico. |
+| **Multi-Tab Editor**| Estable | Soporte para múltiples archivos con pestañas y resaltado. |
+| **Persistencia** | Estable | Guardado automático del estado de la sesión (tabs, layout). |
 
 ---
 
@@ -24,8 +27,8 @@ Referencia de las capacidades actuales de la versión Python de Orchestrator.
 La aplicación está dividida en tres capas principales:
 
 1. **Modelos (`orchestrator/models/`)**: Definiciones de datos compartidas (Agentes, Sesiones, Proveedores).
-2. **Core (`orchestrator/core/`)**: Lógica de negocio, servicios de inferencia y persistencia.
-3. **UI (`orchestrator/ui/`)**: Interfaz gráfica construida con PyQt6 y estilizada con CSS dinámico.
+2. **Core (`core/`)**: Lógica de negocio, servicios de inferencia, gestión de workspaces (`workspace.py`) y persistencia (`session.py`).
+3. **UI (`ui/`)**: Interfaz gráfica construida con PyQt6, incluyendo el `EditorWidget` (tabs) y `FileTreeWidget`.
 
 ---
 
