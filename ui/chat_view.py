@@ -196,7 +196,7 @@ class ChatView(QWidget):
         self.input = _StreamInputField()
         self.input.setObjectName("inputField")
         self.input.setStyleSheet("background: transparent; border: none; padding: 12px 0; color: #f0f4f8;")
-        self.input.setPlaceholderText("Direct Command to Antigravity...")
+        self.input.setPlaceholderText("How can I hellp you today?")
         self.input.setFixedHeight(50)
         self.input.setMaximumHeight(200)
         inp_layout.addWidget(self.input, 1)

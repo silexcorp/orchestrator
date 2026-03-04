@@ -12,6 +12,7 @@ from ui.terminal_widget import TerminalWidget
 from ui.chat_widget import AgentChatWidget
 from ui.file_tree import FileTreeWidget
 from ui.log_panel import LogPanel
+from ui.settings_dialog import SettingsDialog
 from core.ollama_client import OllamaClient
 from core.workspace import WorkspaceManager
 from core.session import SessionManager
@@ -108,6 +109,14 @@ class MainWindow(QMainWindow):
         
         self.recent_menu = file_menu.addMenu("Carpetas Recientes")
         self._update_recent_menu()
+
+        # Edit Actions
+        edit_menu = self.menuBar().addMenu("&Edición")
+        
+        settings_act = QAction("Configuraciones...", self)
+        settings_act.setShortcut("Ctrl+,")
+        settings_act.triggered.connect(self._show_settings)
+        edit_menu.addAction(settings_act)
 
         toolbar.addSeparator()
 
@@ -243,6 +252,15 @@ class MainWindow(QMainWindow):
 
     def _on_model_changed(self, model_name):
         self.chat.agent.ollama.model = model_name
+
+    def _show_settings(self):
+        diag = SettingsDialog(self)
+        if diag.exec():
+            # Refresh agent if necessary
+            self.chat.agent.config_manager.load()
+            active_agent = self.chat.agent.config_manager.get_active_agent()
+            self.chat.agent.system_prompt = active_agent.get("prompt")
+            self.chat.agent.name = active_agent.get("name")
 
     def _check_ollama_connection(self):
         client = OllamaClient()

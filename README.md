@@ -15,7 +15,8 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 - **Robust JSON Parsing**: Advanced agent response extraction with structural repair logic to handle truncated or malformed JSON from models.
 - **Session Persistence**: Automatically restores your last workspace, open tabs, window layout, and preferred Ollama model.
 - **Agent Log Panel**: Real-time activity log in the bottom right, monitoring "Neural Thoughts", Actions, and Sensor Data.
-- **Antigravity Aesthetic**: Premium "Deep Space" visual identity with vibrant cyan/purple accents, responsive chat, and glowing capsule-style input.
+- **Dynamic Agent Profiles & Settings**: Create and edit multiple agent personalities via the new "Edición -> Configuraciones" menu.
+- **Chat Aesthetic**: Premium "Deep Space" visual identity with vibrant cyan/purple accents, responsive chat, and glowing capsule-style input.
 - **Model Selector**: Switch between local Ollama models on the fly.
 
 ## 🚀 Getting Started
@@ -56,12 +57,14 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 
 - **`core/`**:
   - `agent.py`: The AI brain (ReAct loop).
+  - `config.py`: Centralized configuration management and persistence.
   - `tools.py`: File and command execution tools.
   - `workspace.py`: Context snapshot and file management.
   - `session.py`: JSON-based state persistence.
   - `ollama_client.py`: Wrapper for the Ollama API.
 - **`ui/`**:
   - `main_window.py`: Layout integration and signal orchestration.
+  - `settings_dialog.py`: Multi-tab interface for managing agents and tools.
   - `editor_widget.py`: Tabbed code editor with syntax highlighting.
   - `file_tree.py`: Sidebar for project navigation.
   - `chat_widget.py`: Specialized chat with thought/action/observation bubbles.
@@ -71,6 +74,7 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 
 - `Ctrl+S`: Save current file.
 - `Ctrl+Shift+O`: Open folder (Workspace).
+- `Ctrl+,`: Open Settings Dialog.
 - `Ctrl+W`: Close current tab.
 - `Ctrl+Tab`: Switch between tabs.
 - `Enter`: Send message in chat.

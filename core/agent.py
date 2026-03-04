@@ -4,40 +4,21 @@ import os
 from typing import Generator, List, Dict, Any, Optional
 from .ollama_client import OllamaClient
 from .tools import ToolExecutor
-
-SYSTEM_PROMPT = """You are a powerful AI coding agent. You follow the ReAct pattern (Reasoning -> Action -> Observation).
-
-Your goal is to help the user with their coding tasks. You can interact with the file system and run commands.
-
-SIEMPRE responde en formato JSON con los campos: "thought", "action", "params".
-IMPORTANTE: Asegúrate de que el JSON sea válido. NO incluyas comas sobrantes al final de los diccionarios.
-
-Available actions:
-1. create_file: {"path": "file_path", "content": "file_content"}
-2. edit_file: {"path": "file_path", "old": "text_to_replace", "new": "replacement_text"}
-3. read_file: {"path": "file_path"}
-4. run_command: {"command": "shell_command"}
-5. list_files: {"pattern": "*.py"}
-6. finish: {"content": "final_response_to_user"}
-
-Example of a response:
-{
-  "thought": "I need to check the contents of main.py to understand the structure.",
-  "action": "read_file",
-  "params": {"path": "main.py"}
-}
-
-Wait for the "observation" after each action. Use "finish" when you have completed the task.
-Limit your reasoning to 10 steps max.
-"""
+from .config import ConfigManager
 
 class Agent:
     def __init__(self, workspace_manager, model: Optional[str] = None):
+        self.config_manager = ConfigManager()
         self.ollama = OllamaClient(model)
         self.workspace_manager = workspace_manager
         self.tools = ToolExecutor(workspace_manager.get_root())
         self.history: List[Dict[str, str]] = []
         self.max_steps = 10
+        
+        # Load active agent configuration
+        agent_conf = self.config_manager.get_active_agent()
+        self.system_prompt = agent_conf.get("prompt", "")
+        self.name = agent_conf.get("name", "Agent")
 
     def run(self, user_input: str) -> Generator[Dict[str, Any], None, None]:
         # Sync workspace path
@@ -49,7 +30,7 @@ class Agent:
         
         # Inject dynamic context snapshot
         context = self.workspace_manager.get_context_snapshot()
-        dynamic_system_prompt = SYSTEM_PROMPT + "\n---\n" + context
+        dynamic_system_prompt = self.system_prompt + "\n---\n" + context
 
         # Yield initial thinking state
         yield {"type": "thought", "content": "Consultando a Ollama..."}

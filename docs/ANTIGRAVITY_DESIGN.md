@@ -24,6 +24,9 @@ Ubicado en la parte inferior derecha, este panel proporciona una ventana directa
 ### 3. Responsive Chat Layout
 El chat se adapta dinámicamente al ancho disponible en el panel derecho. Las burbujas de mensaje aprovechan el espacio horizontal para maximizar la legibilidad del código y las explicaciones extensas.
 
+### 4. Settings Dashboard (Dynamic Control)
+La ventana de configuraciones extiende el lenguaje visual con un diseño de pestañas limpio y formularios integrados que permiten gestionar la "personalidad" de la IA sin salir de la estética premium.
+
 ## Implementación Técnica
 
-Los estilos están centralizados en `styles.py` y aplicados dinámicamente mediante hojas de estilo de Qt (QSS). Se utilizan transparencias (alfa) y bordes redondeados (14px - 28px) para mantener una estética suave y moderna.
+Los estilos están centralizados en `styles.py` y aplicados dinámicamente mediante hojas de estilo de Qt (QSS). Se utilizan transparencias (alfa), bordes redondeados (14px - 28px) y tipografías sans-serif modernas para mantener una estética suave y vanguardista.
