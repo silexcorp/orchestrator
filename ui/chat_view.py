@@ -24,9 +24,30 @@ except ImportError:
 
 def _to_html(text: str) -> str:
     if _HAS_MD:
+        # Better math handling: support both $$...$$ and \(...\) / \[...\]
+        # Arithmatex handles the math-jax like syntax.
         return _md.markdown(
             text,
-            extensions=["fenced_code", "tables", "nl2br", "sane_lists"],
+            extensions=[
+                "fenced_code", 
+                "tables", 
+                "nl2br", 
+                "sane_lists",
+                "codehilite",
+                "pymdownx.arithmatex"
+            ],
+            extension_configs={
+                "codehilite": {
+                    "css_class": "highlight",
+                    "guess_lang": True,
+                    "use_pygments": True,
+                    "noclasses": True, # Inject inline styles for simplicity in QLabel
+                    "pygments_style": "monokai"
+                },
+                "pymdownx.arithmatex": {
+                    "generic": True
+                }
+            }
         )
     return text.replace("\n", "<br>")
 
@@ -75,6 +96,11 @@ class MessageBubble(QWidget):
                 padding: 10px 4px;
             """)
         
+        # Add basic CSS for CodeHilite if not using inline styles, 
+        # but here we used noclasses: True for easier QLabel support.
+        # We also want to stylize <pre> and <code> tags.
+        self._set_bubble_base_style()
+        
         self.bubble.setWordWrap(True)
         self.bubble.setTextFormat(Qt.TextFormat.RichText)
         self.bubble.setOpenExternalLinks(True)
@@ -95,10 +121,32 @@ class MessageBubble(QWidget):
             row.addStretch(1)
         layout.addLayout(row)
 
+    def _set_bubble_base_style(self):
+        # This CSS will be applied to the rich text content inside the QLabel
+        # Note: QLabel RichText support for CSS is limited (no true CSS classes),
+        # but we can use noclasses=True in markdown and some tag-based styles here.
+        pass
+
     def set_text(self, text: str) -> None:
         self._raw_text = text
         html = _to_html(text) if text else ""
-        self.bubble.setText(html)
+        
+        # Wrap in a custom div to apply some global spacing if needed
+        # and more importantly, format the code blocks
+        styled_html = f"""
+        <style>
+            pre {{ background-color: #1e1e2e; border-radius: 8px; padding: 12px; border: 1px solid #313244; margin: 8px 0; }}
+            code {{ font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 13px; color: #fab387; }}
+            table {{ border-collapse: collapse; margin: 10px 0; width: 100%; }}
+            th, td {{ border: 1px solid #45475a; padding: 8px; text-align: left; }}
+            th {{ background-color: #313244; }}
+            blockquote {{ border-left: 4px solid #89dceb; color: #a6adc8; margin: 0; padding-left: 12px; font-style: italic; }}
+        </style>
+        <div style="line-height: 1.5; color: #cdd6f4;">
+            {html}
+        </div>
+        """
+        self.bubble.setText(styled_html)
 
     def append_text(self, fragment: str) -> None:
         self._raw_text += fragment

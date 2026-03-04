@@ -7,12 +7,10 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 ## ✨ Features
 
 - **Agentic AI Core**: A ReAct-based agent that reasons, acts, and observes. It can create/edit files, list directories, and execute shell commands.
+- **Google Gemini Integration**: Use Google's latest models as the primary brain. Configure your API key in settings for a supercharged experience.
+- **Provider Selection Toggle**: Easily switch between local Ollama and cloud Gemini without manual configuration changes.
+- **Enhanced Chat Rendering**: Support for **LaTeX math formulas** (Arithmatex) and **Syntax Highlighting** (CodeHilite) with Monokai styling.
 - **Brave Search Integration**: Connected to the internet via Brave Search API. Use the agent to find latest docs, news, or technical solutions.
-- **Multi-Chat Support**: Manage multiple independent conversations with a dedicated sidebar. Switch contexts seamlessly.
-- **Automatic Chat Titling**: Chats are automatically named based on your first instruction, keeping your history organized.
-- **Dynamic Context Awareness**: The agent automatically receives a "snapshot" of your workspace, including file structure and active file content.
-- **Multi-Tab Editor**: Edit multiple files simultaneously with syntax highlighting, line numbers, and unsaved change detection (dirty indicators).
-- **Temporal Awareness**: The agent knows the current date, time, and OS environment.
 - **Workspace Management**: Open entire folders as projects. The file tree sidebar allows easy navigation and real-time filesystem monitoring via `watchdog`.
 - **Integrated Terminal**: Run commands directly within the editor with real-time output.
 - **Model Memory Optimization**: Automatically unloads models from GPU/RAM upon application closure, freeing up system resources.
@@ -28,8 +26,9 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 ### Prerequisites
 
 - **Python 3.10+**
-- **Ollama**: [Install Ollama](https://ollama.ai/download) and ensure it's running (`ollama serve`).
-- **Required Models**: We suggest `qwen2.5-coder:7b` or `qwen3.5:9b`.
+- **Ollama**: [Install Ollama](https://ollama.ai/download) for local inference.
+- **Google AI SDK**: `google-genai` for remote Gemini support.
+- **Required Models**: Local (`qwen2.5-coder:7b`) or Remote (`gemini-2.0-flash`).
 
 ### Installation
 
@@ -65,7 +64,8 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
   - `tools.py`: File and command execution tools.
   - `workspace.py`: Context snapshot and file management.
   - `session.py`: JSON-based state persistence.
-  - `ollama_client.py`: Wrapper for the Ollama API.
+  - `ollama_client.py`: Wrapper for local Ollama API.
+  - `gemini_client.py`: Client for the latest Google GenAI SDK.
 - **`ui/`**:
   - `main_window.py`: Layout integration and signal orchestration.
   - `settings_dialog.py`: Multi-tab interface for managing agents and tools.

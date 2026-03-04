@@ -7,8 +7,8 @@ Reference of the current capabilities of the Python version of Orchestrator.
 | Feature | Status | Description |
 | :--- | :--- | :--- |
 | **Chat with Ollama** | Stable | Local inference optimized via the Ollama API. |
-| **Remote Providers**| Stable | Support for OpenAI, Anthropic, OpenRouter, and xAI. |
-| **MCP Server** | Stable | OpenAI-compatible API to connect other AI apps. |
+| **Google Gemini** | Stable | Support for Gemini 2.0 via official Google GenAI SDK. |
+| **Remote Providers**| Stable | Unified support for Anthropic, OpenAI, and OpenRouter. |
 | **Agents** | Stable | Custom profiles with system prompts and themes. |
 | **Search (Web)** | Stable | Integrated Brave Search API for live internet access. |
 | **Multi-Chat** | Stable | Sidebar with independent sessions and auto-titling. |
@@ -44,8 +44,11 @@ The application is divided into three main layers:
 ### Ollama (Local)
 Orchestrator communicates with the Ollama server (`localhost:11434`). It allows downloading, deleting, and listing models directly from the management interface.
 
-### Remote Providers (Cloud)
-Configure your API Keys to use Claude (Anthropic), GPT-4 (OpenAI), or any model available on OpenRouter. Orchestrator unifies these APIs so the chat is provider-agnostic.
+### Google Gemini (Cloud)
+Configure your Google API Key to use the latest Gemini models. Orchestrator uses the modern `google-genai` SDK for high-performance streaming.
+
+### Other Remote Providers
+Configure your API Keys to use Claude (Anthropic) or GPT-4 (OpenAI). Orchestrator unifies these APIs so the chat is provider-agnostic.
 
 ---
 

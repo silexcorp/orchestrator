@@ -30,6 +30,7 @@ Orchestrator includes configurations for common providers:
 
 | Preset         | Host              | Port | Base Path | API Format | Auth             |
 | -------------- | ----------------- | ---- | --------- | ---------- | ---------------- |
+| **Google Gemini**| AI Studio         | 443  | /v1       | GenAI SDK | API Key required |
 | **Anthropic**  | api.anthropic.com | 443  | /v1       | Anthropic  | API Key required |
 | **OpenAI**     | api.openai.com    | 443  | /v1       | OpenAI     | API Key required |
 | **xAI**        | api.x.ai          | 443  | /v1       | OpenAI     | API Key required |

@@ -30,10 +30,10 @@ Orchestrator remembers your work pace. When closing the program, it is automatic
 
 *   The last opened workspace.
 *   The list of files you had in tabs.
-*   The Ollama model you were using.
+*   **Provider Choice**: Remembers whether you prefer **Ollama** or **Gemini** via a dedicated toggle.
+*   **Model Selection**: Remembers the specific local model or the remote Gemini version.
 *   The size and position of panels (Splitters).
 *   **Panel Visibility**: Preferences for showing/hiding the File Explorer, Terminal, Log Panel, and Chat History Sidebar.
-*   **Model Choice**: Remembers the last selected Ollama model.
 
 ## Multi-Chat & Conversation Persistence
 
@@ -52,4 +52,11 @@ The agent has access to specialized tools to navigate the project:
 *   `create_file` / `edit_file`: Capability to make changes directly in the code.
 
 ---
-*Note: This mode requires having Ollama installed and running so the agent can reason about the code.*
+---
+## Advanced Rendering
+
+In any mode, Orchestrator provides:
+- **Math Visualization**: High-fidelity **LaTeX** rendering for technical responses.
+- **Syntax Highlighting**: Beautiful code blocks with Monokai styling.
+
+*Note: IDE mode is fully compatible with both local Ollama and remote Google Gemini.*
