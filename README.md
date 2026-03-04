@@ -28,7 +28,7 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 - **Python 3.10+**
 - **Ollama**: [Install Ollama](https://ollama.ai/download) for local inference.
 - **Google AI SDK**: `google-genai` for remote Gemini support.
-- **Required Models**: Local (`qwen2.5-coder:7b`) or Remote (`gemini-2.0-flash`).
+- **Required Models**: Local (`qwen3.5:4b`) or Remote (`gemini-2.0-flash`).
 
 ### Installation
 
