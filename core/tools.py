@@ -73,9 +73,9 @@ class ToolExecutor:
             results = []
             for item in data.get("web", {}).get("results", []):
                 title = item.get("title")
-                url = item.get("description") # Brave uses 'description' for snippet
+                url = item.get("url")
                 snippet = item.get("description")
-                results.append(f"Title: {title}\nSnippet: {snippet}\nURL: {item.get('url')}\n")
+                results.append(f"Title: {title}\nSnippet: {snippet}\nURL: {url}\n")
             
             if not results:
                 return "No web results found."

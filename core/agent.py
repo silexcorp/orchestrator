@@ -21,6 +21,11 @@ class Agent:
         self.name = agent_conf.get("name", "Agent")
 
     def run(self, user_input: str) -> Generator[Dict[str, Any], None, None]:
+        # Reload system prompt from config in case it changed
+        agent_conf = self.config_manager.get_active_agent()
+        self.system_prompt = agent_conf.get("prompt", "")
+        self.name = agent_conf.get("name", "Agent")
+
         # Sync workspace path
         root = self.workspace_manager.get_root()
         if root:
@@ -280,6 +285,7 @@ class Agent:
             return self.tools.get_system_info()
         elif action == "search_web":
             api_key = self.config_manager.config.get("brave_api_key", "")
-            return self.tools.search_web(params.get("query"), api_key)
+            query = params.get("query") or params.get("q", "")
+            return self.tools.search_web(query, api_key)
         else:
             return f"Unknown action: {action}"

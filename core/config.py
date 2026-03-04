@@ -9,7 +9,7 @@ DEFAULT_CONFIG = {
         {
             "id": "default",
             "name": "Orchestrator 🦕",
-            "prompt": "You are a powerful AI coding agent. You follow the ReAct pattern (Reasoning -> Action -> Observation).\n\nIMPORTANT: You must output YOUR ENTIRE RESPONSE as a valid JSON object with the following keys:\n- \"thought\": Your internal reasoning.\n- \"action\": The tool to use (one of the below).\n- \"params\": A dictionary of arguments for the tool.\n\nTOOLS:\n- get_system_info: Get current date, time, OS and workspace info.\n- search_files(pattern): Search for files in the workspace using a glob pattern (e.g. '*.py').\n- read_file(path): Read content of a file.\n- create_file(path, content): Create a new file.\n- edit_file(path, old, new): Edit an existing file by replacing 'old' text with 'new' text.\n- run_command(command): Run a terminal command.\n- search_web(query): Search the internet for information if you don't know the answer or need latest docs.\n- finish(content): Finish the task and provide a final response.\n\nAlways use get_system_info if you need temporal awareness. NEVER say you will do something without providing an 'action'.",
+            "prompt": "You are a powerful AI coding agent capable of interacting with the real world. You follow the ReAct pattern (Thought -> Action -> Observation).\n\nCRITICAL RULES:\n1. ALWAYS output your response as a SINGLE JSON OBJECT.\n2. NEVER output plain text outside the JSON.\n3. If you need information you don't have, ALWAYS use search_web or search_files first. DO NOT apologize or say you cannot do it.\n4. Do not use 'finish' until you have actually accomplished the goal.\n\nJSON FORMAT:\n{\n  \"thought\": \"I need to find X...\",\n  \"action\": \"tool_name\",\n  \"params\": {\"arg\": \"val\"}\n}\n\nEXAMPLE TOOL USAGE:\nRequest: 'Who is Okan iD?'\nResponse:\n{\n  \"thought\": \"I don't have information about 'Okan iD' in my knowledge. I need to search the web.\",\n  \"action\": \"search_web\",\n  \"params\": {\"query\": \"Okan iD\"}\n}\n\nTOOLS:\n- get_system_info: Current date/time/OS/workspace.\n- search_files(pattern): Glob search (e.g. '*.py').\n- read_file(path): Read file content.\n- create_file(path, content): New file.\n- edit_file(path, old, new): Edit file.\n- run_command(command): Terminal command.\n- search_web(query): Search the internet using Brave Search API.\n- finish(content): Provide final answer to user.\n\nYou ARE connected to the internet via search_web. Use it.",
             "color": "#00f2ff"
         },
         {
@@ -48,10 +48,27 @@ class ConfigManager:
         try:
             with open(self.config_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                # Merge with default to ensure all keys exist
+                
+                # Merge top-level keys
                 for key, val in DEFAULT_CONFIG.items():
                     if key not in data:
                         data[key] = val
+                
+                # Deep merge tools
+                if "tools" in data:
+                    for tool_id, enabled in DEFAULT_CONFIG["tools"].items():
+                        if tool_id not in data["tools"]:
+                            data["tools"][tool_id] = enabled
+
+                # HEURISTIC: Force update "default" prompt if it's old or lacks tools info
+                for agent in data.get("agents", []):
+                    if agent.get("id") == "default":
+                        current_prompt = agent.get("prompt", "")
+                        # If it's the very old placeholder prompt, update it to latest.
+                        if "Your goal is to help the user with their coding tasks" in current_prompt or "search_web" not in current_prompt:
+                            agent["prompt"] = DEFAULT_CONFIG["agents"][0]["prompt"]
+                            print("Updated default agent prompt to latest version.")
+
                 return data
         except Exception as e:
             print(f"Error loading config: {e}")
