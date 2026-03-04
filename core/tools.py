@@ -11,9 +11,7 @@ class ToolExecutor:
         if self.workspace_path and not os.path.exists(self.workspace_path):
             os.makedirs(self.workspace_path)
 
-    def _full_path(self, path: Optional[str]) -> str:
-        if not path:
-            raise ValueError("No path provided for the operation.")
+    def _full_path(self, path: str) -> str:
         if not self.workspace_path:
             raise ValueError("No workspace opened. Please open a folder first.")
         # Prevent path traversal
@@ -130,70 +128,6 @@ class ToolExecutor:
             return f"File {path} edited successfully"
         except Exception as e:
             return f"Error editing file: {str(e)}"
-
-    def list_dir(self, path: str = ".") -> str:
-        """List contents of a directory (absolute or relative to workspace)."""
-        try:
-            full_path = self._full_path(path)
-            if not os.path.isdir(full_path):
-                return f"Error: {path} is not a directory."
-            
-            items = os.listdir(full_path)
-            output = []
-            for item in sorted(items):
-                item_path = os.path.join(full_path, item)
-                prefix = "[D] " if os.path.isdir(item_path) else "[F] "
-                output.append(f"{prefix}{item}")
-            
-            if not output:
-                return f"Directory {path} is empty."
-            return "\n".join(output)
-        except Exception as e:
-            return f"Error listing directory {path}: {str(e)}"
-
-    def find_by_name(self, pattern: str) -> str:
-        """Find files by name glob pattern across the entire workspace."""
-        if not self.workspace_path:
-            return "Error: No workspace opened."
-        
-        matches = []
-        for root, dirs, filenames in os.walk(self.workspace_path):
-            # Skip common junk/venv folders for speed
-            dirs[:] = [d for d in dirs if d not in {'.git', 'venv', '.venv', 'node_modules', '__pycache__'}]
-            for filename in fnmatch.filter(filenames, pattern):
-                rel_path = os.path.relpath(os.path.join(root, filename), self.workspace_path)
-                matches.append(rel_path)
-        
-        if not matches:
-            return f"No files found matching name: {pattern}"
-        return "\n".join(matches)
-
-    def delete_file(self, path: str) -> str:
-        """Delete a file from the workspace."""
-        try:
-            full_path = self._full_path(path)
-            if not os.path.isfile(full_path):
-                return f"Error: {path} is not a file or does not exist."
-            os.remove(full_path)
-            return f"File {path} deleted successfully."
-        except Exception as e:
-            return f"Error deleting file {path}: {str(e)}"
-
-    def move_file(self, old_path: str, new_path: str) -> str:
-        """Move or rename a file/directory within the workspace."""
-        try:
-            full_old = self._full_path(old_path)
-            full_new = self._full_path(new_path)
-            
-            # Ensure destination directory exists
-            dest_dir = os.path.dirname(full_new)
-            if not os.path.exists(dest_dir):
-                os.makedirs(dest_dir)
-                
-            os.rename(full_old, full_new)
-            return f"Moved/Renamed {old_path} to {new_path}"
-        except Exception as e:
-            return f"Error moving {old_path} to {new_path}: {str(e)}"
 
     def read_file(self, path: str) -> str:
         try:

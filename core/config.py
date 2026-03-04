@@ -12,31 +12,13 @@ DEFAULT_CONFIG = {
         {
             "id": "default",
             "name": "Orchestrator 🦕",
-            "prompt": "You are a Senior Software Engineer AI Agent. Your goal is to solve complex coding tasks within this project autonomously and reliably.\n\nOPERATING MODE: ReAct (Thought -> Action -> Observation).\n\nHOW TO WORK:\n1. EXPLORE: Use 'search_files', 'find_by_name', and 'grep_search' to map the project.\n2. ANALYZE: Use 'list_dir' and 'read_file' to understand context.\n3. EXECUTE: Use 'edit_file', 'create_file', 'move_file', or 'delete_file' to implement changes.\n4. VERIFY: Use 'run_command' to ensure everything works.\n\nJSON FORMAT:\n{\n  \"thought\": \"Reasoning...\",\n  \"action\": \"tool_name\",\n  \"params\": {\"arg\": \"val\"}\n}",
+            "prompt": "You are a Senior Software Engineer AI Agent. Your goal is to solve complex coding tasks within this project autonomously and reliably.\n\nOPERATING MODE: ReAct (Thought -> Action -> Observation).\n\nHOW TO WORK:\n1. EXPLORE: When asked for a change, first use 'search_files' and 'grep_search' to find all relevant code. Don't assume you know where everything is.\n2. READ: Use 'read_file' to understand the code before suggesting any edits.\n3. PLAN: Internalize the project's architecture and coding style.\n4. EXECUTE: Use 'edit_file' or 'create_file' to implement the solution. \n5. VERIFY: ALWAYS use 'run_command' to run tests, linters, or try to build the project after your changes. If you break something, fix it immediately.\n6. COMPLETE: Only use 'finish' when you have verified that the task is fully accomplished and functional.\n\nCRITICAL RULES:\n- ALWAYS output a single JSON object.\n- NEVER use placeholders. Provide complete, functional code.\n- Be concise but thorough.\n- If a file is long, read it in chunks if necessary (your current 'read_file' supports full reading, but be selective).\n\nJSON FORMAT:\n{\n  \"thought\": \"Detailed reasoning about the project state and next steps...\",\n  \"action\": \"tool_name\",\n  \"params\": {\"arg\": \"val\"}\n}\n\nTOOLS:\n- get_system_info: System context (OS, date, workspace).\n- search_files(pattern): Find files by name glob.\n- grep_search(query): Find string occurrences across all files.\n- read_file(path): Read complete content of a file.\n- create_file(path, content): Create a new file with full content.\n- edit_file(path, old, new): Replace 'old' text block with 'new' text block exactly.\n- run_command(command): Execute any shell command in the workspace.\n- search_web(query): Search the internet for documentation or solutions.\n- finish(content): Final message to the user with a summary of accomplishment.\n",
             "color": "#00f2ff"
         },
         {
-            "id": "architect",
-            "name": "Arquitecto de Código",
-            "prompt": "You are a Software Architect. You focus on project structure, refactoring, and clean code. Use 'list_dir' and 'move_file' to organize the workspace. Ensure all components are logically placed.",
-            "color": "#ffaa00"
-        },
-        {
-            "id": "researcher",
-            "name": "Investigador Académico",
-            "prompt": "You are a Research Agent. You excel at finding information using 'search_web' and performing deep analysis with 'grep_search'. Your goal is to provide detailed reports and documentation.",
-            "color": "#00ff88"
-        },
-        {
-            "id": "security",
-            "name": "Auditor de Seguridad",
-            "prompt": "You are a Security Specialist. Analyze code for vulnerabilities using 'read_file' and 'grep_search'. Use 'run_command' to execute security scanners or audit tools.",
-            "color": "#ff4444"
-        },
-        {
-            "id": "doc_agent",
-            "name": "Documentador Técnico",
-            "prompt": "You are a Documentation Expert. Keep READMEs, wikis, and docstrings up to date. Use 'read_file' to understand the code and 'edit_file' to improve its documentation.",
+            "id": "creative",
+            "name": "Creative Assistant",
+            "prompt": "You are a creative coding assistant. You focus on beautiful UI, animations, and clean architectures. Use get_system_info for context and search_web for inspiration.",
             "color": "#8a2be2"
         }
     ],
@@ -49,11 +31,7 @@ DEFAULT_CONFIG = {
         "get_system_info": True,
         "search_files": True,
         "search_web": True,
-        "grep_search": True,
-        "list_dir": True,
-        "find_by_name": True,
-        "delete_file": True,
-        "move_file": True
+        "grep_search": True
     },
     "active_agent_id": "default"
 }
@@ -86,38 +64,16 @@ class ConfigManager:
                         if tool_id not in data["tools"]:
                             data["tools"][tool_id] = enabled
 
-                # HEURISTIC: Force update "default" prompt and add missing specialized agents
-                current_agent_ids = {a.get("id") for a in data.get("agents", [])}
-                config_changed = False
-                
-                for default_agent in DEFAULT_CONFIG["agents"]:
-                    if default_agent["id"] not in current_agent_ids:
-                        data["agents"].append(default_agent)
-                        current_agent_ids.add(default_agent["id"])
-                        config_changed = True
-                        print(f"Added missing agent: {default_agent['name']}")
-                    elif default_agent["id"] == "default":
-                        # Always update the default agent prompt to ensure it has the latest tools instructions
-                        for a in data["agents"]:
-                            if a["id"] == "default":
-                                if a.get("prompt") != default_agent["prompt"]:
-                                    a["prompt"] = default_agent["prompt"]
-                                    config_changed = True
-                                break
-                
-                # Ensure all tools from DEFAULT_CONFIG are present in the loaded data
-                if "tools" not in data:
-                    data["tools"] = DEFAULT_CONFIG["tools"]
-                    config_changed = True
-                else:
-                    for tool_name, enabled in DEFAULT_CONFIG["tools"].items():
-                        if tool_name not in data["tools"]:
-                            data["tools"][tool_name] = enabled
-                            config_changed = True
+                # HEURISTIC: Force update "default" prompt if it's old or lacks tools info
+                for agent in data.get("agents", []):
+                    if agent.get("id") == "default":
+                        current_prompt = agent.get("prompt", "")
+                        # If it's the very old placeholder prompt, update it to latest.
+                        if "Your goal is to help the user with their coding tasks" in current_prompt or "search_web" not in current_prompt:
+                            agent["prompt"] = DEFAULT_CONFIG["agents"][0]["prompt"]
+                            print("Updated default agent prompt to latest version.")
 
                 self.config = data
-                if config_changed:
-                    self.save()
                 return data
         except Exception as e:
             print(f"Error loading config: {e}")

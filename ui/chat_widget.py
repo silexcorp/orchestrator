@@ -132,10 +132,7 @@ class AgentChatWidget(QWidget): # Changed from ChatView to QWidget to hold sideb
 
     def _on_chat_selected(self, index):
         if index < 0: return
-        item = self.chat_list.currentItem()
-        if not item: return
-        
-        chat_id = item.data(Qt.ItemDataRole.UserRole)
+        chat_id = self.chat_list.currentItem().data(Qt.ItemDataRole.UserRole)
         if chat_id == self.current_chat_id: return
         
         self.current_chat_id = chat_id
@@ -208,35 +205,17 @@ class AgentChatWidget(QWidget): # Changed from ChatView to QWidget to hold sideb
         self.chat_list.addItem(item)
         self.chat_list.setCurrentRow(self.chat_list.count() - 1)
 
-    def clear_session(self):
-        """Clear current chat session and memory for a fresh start."""
-        self.agent.history = []
-        self.chat_view.clear_messages()
-        self.chat_view.welcome_widget.show()
-        self.chat_view.scroll.hide()
-        self._new_chat()
-
     def _delete_current_chat(self):
+        if not self.current_chat_id: return
+        self.session_manager.delete_chat(self.current_chat_id)
         row = self.chat_list.currentRow()
-        if row < 0: return
-        
-        item = self.chat_list.item(row)
-        if not item: return
-        
-        chat_id = item.data(Qt.ItemDataRole.UserRole)
-        self.session_manager.delete_chat(chat_id)
         self.chat_list.takeItem(row)
         self.current_chat_id = None
         
         if self.chat_list.count() == 0:
             self._new_chat()
         else:
-            new_row = max(0, row - 1)
-            self.chat_list.setCurrentRow(new_row)
-            # Signal currentRowChanged will handle _on_chat_selected automatically
-            # if index changed. If it didn't (e.g. from 0 to 0), we call it manually
-            if row == 0:
-                self._on_chat_selected(0)
+            self.chat_list.setCurrentRow(max(0, row - 1))
 
     def _submit_text(self, text: str) -> None:
         self.chat_view._add_bubble(text, "user")

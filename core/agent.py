@@ -7,6 +7,7 @@ from .gemini_client import GeminiClient
 from .tools import ToolExecutor
 from .config import ConfigManager
 
+
 class Agent:
     def __init__(self, workspace_manager, model: Optional[str] = None):
         self.config_manager = ConfigManager()
@@ -28,7 +29,7 @@ class Agent:
         conf = self.config_manager.config
         gemini_key = conf.get("gemini_api_key")
         preferred = conf.get("preferred_provider", "ollama")
-        
+
         if preferred == "gemini" and gemini_key and gemini_key.strip():
             return GeminiClient(gemini_key, conf.get("remote_model", "gemini-2.0-flash"))
         return OllamaClient(self.model)
@@ -88,11 +89,11 @@ class Agent:
 
                 # Execute tool
                 observation = self._execute_tool(action, params)
-                
-                # Truncate observation to prevent extreme context bloat
-                if len(observation) > 50000:
-                    observation = observation[:50000] + "\n... (output truncated for brevity. File is very large) ..."
-                
+
+                # Truncate observation to prevent context bloat
+                if len(observation) > 2000:
+                    observation = observation[:2000] + "\n... (output truncated for brevity) ..."
+
                 yield {"type": "observation", "content": observation}
 
                 # Add step to history
@@ -295,47 +296,19 @@ class Agent:
     # -------------------------------------------------------------------------
 
     def _execute_tool(self, action: str, params: Dict[str, Any]) -> str:
-        # Pre-validation of common parameters
-        path = params.get("path")
-        
         if action == "create_file":
-            if not path: return "Error: Missing 'path' parameter for create_file."
-            return self.tools.create_file(path, params.get("content", ""))
+            return self.tools.create_file(params.get("path"), params.get("content", ""))
         elif action == "edit_file":
-            if not path: return "Error: Missing 'path' parameter for edit_file."
-            return self.tools.edit_file(path, params.get("old", ""), params.get("new", ""))
-        elif action == "grep_search":
-            query = params.get("query")
-            if not query: return "Error: Missing 'query' parameter for grep_search."
-            return self.tools.grep_search(query)
+            return self.tools.edit_file(params.get("path"), params.get("old", ""), params.get("new", ""))
         elif action == "read_file":
-            if not path: return "Error: Missing 'path' parameter for read_file."
-            return self.tools.read_file(path)
-        elif action == "list_dir":
-            return self.tools.list_dir(path or ".")
-        elif action == "find_by_name":
-            pattern = params.get("pattern") or "*"
-            return self.tools.find_by_name(pattern)
-        elif action == "delete_file":
-            if not path: return "Error: Missing 'path' parameter for delete_file."
-            return self.tools.delete_file(path)
-        elif action == "move_file":
-            old_p = params.get("old")
-            new_p = params.get("new")
-            if not old_p or not new_p: return "Error: Missing 'old' or 'new' parameters for move_file."
-            return self.tools.move_file(old_p, new_p)
+            return self.tools.read_file(params.get("path"))
         elif action == "list_files" or action == "search_files":
             return self.tools.search_files(params.get("pattern", "*"))
         elif action == "get_system_info":
             return self.tools.get_system_info()
-        elif action == "run_command":
-            cmd = params.get("command")
-            if not cmd: return "Error: Missing 'command' parameter for run_command."
-            return self.tools.run_command(cmd)
         elif action == "search_web":
             api_key = self.config_manager.config.get("brave_api_key", "")
             query = params.get("query") or params.get("q", "")
-            if not query: return "Error: Missing 'query' parameter for search_web."
             return self.tools.search_web(query, api_key)
         else:
             return f"Unknown action: {action}"
