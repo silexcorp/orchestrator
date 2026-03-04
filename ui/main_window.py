@@ -27,8 +27,8 @@ class MainWindow(QMainWindow):
         self.session_manager = SessionManager()
         
         self._setup_ui()
-        self._load_session()
         self._setup_toolbar()
+        self._load_session()
 
     def _setup_ui(self):
         central_widget = QWidget()
@@ -121,6 +121,25 @@ class MainWindow(QMainWindow):
         settings_act.triggered.connect(self._show_settings)
         edit_menu.addAction(settings_act)
 
+        # View Actions (Toggle Panels)
+        view_menu = self.menuBar().addMenu("&View")
+        self.toggle_actions = {}
+        
+        panels = [
+            ("File Explorer", self.file_tree),
+            ("Code Editor", self.editor),
+            ("Agent Chat", self.chat),
+            ("Terminal", self.terminal),
+            ("Log Panel", self.log_panel)
+        ]
+        
+        for name, widget in panels:
+            act = QAction(name, self, checkable=True)
+            act.setChecked(True)
+            act.triggered.connect(lambda checked, w=widget, n=name: self._toggle_panel(n, checked))
+            view_menu.addAction(act)
+            self.toggle_actions[name] = act
+
         toolbar.addSeparator()
 
         # Model Selector
@@ -143,6 +162,25 @@ class MainWindow(QMainWindow):
         self.conn_timer = QTimer()
         self.conn_timer.timeout.connect(self._check_ollama_connection)
         self.conn_timer.start(5000)
+
+    def _toggle_panel(self, name, visible):
+        widget_map = {
+            "File Explorer": self.file_tree,
+            "Code Editor": self.editor,
+            "Agent Chat": self.chat,
+            "Terminal": self.terminal,
+            "Log Panel": self.log_panel
+        }
+        widget = widget_map.get(name)
+        if widget:
+            widget.setVisible(visible)
+            
+            # Special case: If all bottom panels are hidden, hide the bottom splitter
+            if name in ["Terminal", "Log Panel"]:
+                # Use isHidden() or the 'visible' parameter directly to avoid recursive visibility issues
+                has_terminal = visible if name == "Terminal" else not self.terminal.isHidden()
+                has_log = visible if name == "Log Panel" else not self.log_panel.isHidden()
+                self.bottom_splitter.setVisible(has_terminal or has_log)
 
     def _open_folder_dialog(self):
         path = QFileDialog.getExistingDirectory(self, "Select Folder")
@@ -193,6 +231,13 @@ class MainWindow(QMainWindow):
                 v_sizes = state["splitter_sizes"].get("vertical")
                 if v_sizes: self.v_splitter.setSizes(v_sizes)
             
+            # Restore Panel Visibility
+            visibility = state.get("panel_visibility", {})
+            for name, is_visible in visibility.items():
+                if name in self.toggle_actions:
+                    self.toggle_actions[name].setChecked(is_visible)
+                    self._toggle_panel(name, is_visible)
+
             # Restore Model
             self.last_model = state.get("last_model")
 
@@ -201,10 +246,13 @@ class MainWindow(QMainWindow):
         for i in range(self.editor.count()):
             open_files.append(self.editor.widget(i).file_path)
             
+        visibility = {name: act.isChecked() for name, act in self.toggle_actions.items()}
+
         state = {
             "last_workspace": self.workspace_manager.get_root(),
             "last_model": self.model_combo.currentText(),
             "open_files": open_files,
+            "panel_visibility": visibility,
             "splitter_sizes": {
                 "horizontal": self.h_splitter.sizes(),
                 "vertical": self.v_splitter.sizes()
