@@ -1,59 +1,62 @@
-# Funcionalidades de Orchestrator (Python/Linux)
+# Orchestrator Features (Python/Linux)
 
-Referencia de las capacidades actuales de la versión Python de Orchestrator.
+Reference of the current capabilities of the Python version of Orchestrator.
 
-## Matriz de Funcionalidades
+## Feature Matrix
 
-| Funcionalidad | Estado | Descripción |
+| Feature | Status | Description |
 | :--- | :--- | :--- |
-| **Chat con Ollama** | Estable | Inferencia local optimizada mediante la API de Ollama. |
-| **Proveedores Remotos**| Estable | Soporte para OpenAI, Anthropic, OpenRouter y xAI. |
-| **Servidor MCP** | Estable | API compatible con OpenAI para conectar otras apps de IA. |
-| **Agentes** | Estable | Perfiles personalizados con prompts de sistema y temas. |
-| **Memory** | Estable | Búsqueda por palabras clave (BM25) y perfiles de usuario. |
-| **Schedules** | Estable | Tareas automáticas programadas mediante expresiones CRON. |
-| **Watchers** | Estable | Monitoreo de cambios en carpetas para disparar acciones. |
-| **Skills** | Estable | Importación de lógica de IA desde archivos Markdown. |
-| **Work Mode** | Estable | Orquestador de tareas multi-paso (Agentes autónomos). |
-| **Insights** | Estable | Registro de velocidad (tokens/s), latencia y éxito de inferencia. |
-| **Workspace (IDE)** | Estable | Apertura de carpetas, árbol de archivos y contexto dinámico. |
-| **Multi-Tab Editor**| Estable | Soporte para múltiples archivos con pestañas y resaltado. |
-| **Persistencia** | Estable | Guardado automático del estado de la sesión (tabs, layout). |
-| **Optimización VRAM**| Estable | Descarga automática de modelos al cerrar para liberar GPU. |
-| **JSON Robust** | Estable | Reparación estructural de respuestas truncadas o malformadas. |
+| **Chat with Ollama** | Stable | Local inference optimized via the Ollama API. |
+| **Remote Providers**| Stable | Support for OpenAI, Anthropic, OpenRouter, and xAI. |
+| **MCP Server** | Stable | OpenAI-compatible API to connect other AI apps. |
+| **Agents** | Stable | Custom profiles with system prompts and themes. |
+| **Memory** | Stable | Keyword search (BM25) and user profiles. |
+| **Schedules** | Stable | Automated tasks scheduled via CRON expressions. |
+| **Watchers** | Stable | Folder monitoring to trigger automatic actions. |
+| **Skills** | Stable | Import AI logic from Markdown files. |
+| **Work Mode** | Stable | Multi-step task orchestrator (Autonomous Agents). |
+| **Insights** | Stable | Logs for speed (tokens/s), latency, and inference success. |
+| **Workspace (IDE)** | Stable | Folder opening, file tree, and dynamic context. |
+| **Multi-Tab Editor**| Stable | Support for multiple files with tabs and highlighting. |
+| **Persistence** | Stable | Automatic session state saving (tabs, layout). |
+| **VRAM Optimization**| Stable | Automatic model unloading on close to free up GPU. |
+| **Robust JSON** | Stable | Structural repair for truncated or malformed responses. |
+| **Settings** | Stable | Full management of profiles, models, and tools (`Ctrl+,`). |
+| **Dynamic Agents** | Stable | Create and edit multiple personalities with unique prompts. |
+| **Antigravity UI** | Stable | Premium "Deep Space" interface with cyan/purple accents and glow. |
 
 ---
 
-## Detalles de Arquitectura
+## Architecture Details
 
-La aplicación está dividida en tres capas principales:
+The application is divided into three main layers:
 
-1. **Modelos (`orchestrator/models/`)**: Definiciones de datos compartidas (Agentes, Sesiones, Proveedores).
-2. **Core (`core/`)**: Lógica de negocio, servicios de inferencia, gestión de workspaces (`workspace.py`) y persistencia (`session.py`).
-| 3. **UI (`ui/`)**: Interfaz gráfica construida con PyQt6, incluyendo el `EditorWidget` (tabs), `FileTreeWidget` y el nuevo `LogPanel`. Ver [Diseño Antigravity](ANTIGRAVITY_DESIGN.md).
+1. **Models (`orchestrator/models/`)**: Shared data definitions (Agents, Sessions, Providers).
+2. **Core (`core/`)**: Business logic, inference services, workspace management (`workspace.py`), and persistence (`session.py`).
+3. **UI (`ui/`)**: Graphic interface built with PyQt6, including the `EditorWidget` (tabs), `FileTreeWidget`, and the new `LogPanel`. See [Antigravity Design](ANTIGRAVITY_DESIGN.md).
 
 ---
 
-## Local vs Remoto
+## Local vs Remote
 
 ### Ollama (Local)
-Orchestrator se comunica con el servidor de Ollama (`localhost:11434`). Permite descargar, borrar y listar modelos directamente desde la interfaz de gestión.
+Orchestrator communicates with the Ollama server (`localhost:11434`). It allows downloading, deleting, and listing models directly from the management interface.
 
-### Remote Providers (Nube)
-Configura tus API Keys para usar Claude (Anthropic), GPT-4 (OpenAI) o cualquier modelo disponible en OpenRouter. Orchestrator unifica estas APIs para que el chat sea agnóstico al proveedor.
+### Remote Providers (Cloud)
+Configure your API Keys to use Claude (Anthropic), GPT-4 (OpenAI), or any model available on OpenRouter. Orchestrator unifies these APIs so the chat is provider-agnostic.
 
 ---
 
-## Automatización
+## Automation
 
 ### Watchers
-Utiliza la librería `watchdog` para detectar cambios en el sistema de archivos. Cuando un archivo es creado o modificado en una carpeta vigilada, puedes configurar un agente para que procese esa información automáticamente.
+Uses the `watchdog` library to detect filesystem changes. When a file is created or modified in a watched folder, you can configure an agent to process that information automatically.
 
 ### Schedules
-Permite ejecutar promts de manera recurrente. Ideal para reportes diarios, resúmenes de noticias o tareas de mantenimiento de datos.
+Allows executing prompts on a recurring basis. Ideal for daily reports, news summaries, or data maintenance tasks.
 
 ---
 
-## Servidor MCP
+## MCP Server
 
-Orchestrator puede actuar como un puente para otras aplicaciones. Al activar el servidor, este expone un endpoint compatible con la especificación de Chat Completions de OpenAI. Esto permite usar tus agentes y modelos locales de Orchestrator en herramientas como Cursor o extensiones de VS Code.
+Orchestrator can act as a bridge for other applications. When activating the server, it exposes an endpoint compatible with the OpenAI Chat Completions specification. This allows using your local Orchestrator agents and models in tools like Cursor or VS Code extensions.

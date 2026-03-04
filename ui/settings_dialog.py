@@ -10,7 +10,7 @@ from core.config import ConfigManager
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Configuraciones")
+        self.setWindowTitle("Settings")
         self.resize(700, 500)
         self.config_manager = ConfigManager()
         self._setup_ui()
@@ -19,9 +19,9 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout(self)
         
         self.tabs = QTabWidget()
-        self.tabs.addTab(self._create_agents_tab(), "Agentes")
-        self.tabs.addTab(self._create_models_tab(), "Modelos")
-        self.tabs.addTab(self._create_tools_tab(), "Herramientas")
+        self.tabs.addTab(self._create_agents_tab(), "Agents")
+        self.tabs.addTab(self._create_models_tab(), "Models")
+        self.tabs.addTab(self._create_tools_tab(), "Tools")
         
         layout.addWidget(self.tabs)
         
@@ -29,11 +29,11 @@ class SettingsDialog(QDialog):
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         
-        save_btn = QPushButton("Guardar Todo")
+        save_btn = QPushButton("Save All")
         save_btn.setObjectName("sendBtn") # Use the premium style
         save_btn.clicked.connect(self._save_and_close)
         
-        cancel_btn = QPushButton("Cancelar")
+        cancel_btn = QPushButton("Cancel")
         cancel_btn.clicked.connect(self.reject)
         
         btn_layout.addWidget(cancel_btn)
@@ -50,10 +50,10 @@ class SettingsDialog(QDialog):
         self.agent_list.currentRowChanged.connect(self._on_agent_selected)
         
         left_layout = QVBoxLayout()
-        left_layout.addWidget(QLabel("Perfiles de Agentes"))
+        left_layout.addWidget(QLabel("Agent Profiles"))
         left_layout.addWidget(self.agent_list)
         
-        add_btn = QPushButton("+ Añadir")
+        add_btn = QPushButton("+ Add")
         add_btn.clicked.connect(self._add_agent)
         left_layout.addWidget(add_btn)
         
@@ -68,9 +68,9 @@ class SettingsDialog(QDialog):
         self.agent_color = QLineEdit()
         self.agent_color.setPlaceholderText("#00f2ff")
         
-        edit_layout.addRow("Nombre:", self.agent_name)
-        edit_layout.addRow("Prompt de Sistema:", self.agent_prompt)
-        edit_layout.addRow("Color Acento (HEX):", self.agent_color)
+        edit_layout.addRow("Name:", self.agent_name)
+        edit_layout.addRow("System Prompt:", self.agent_prompt)
+        edit_layout.addRow("Accent Color (HEX):", self.agent_color)
         
         layout.addWidget(self.agent_editor, 1)
         
@@ -84,13 +84,13 @@ class SettingsDialog(QDialog):
         self.ollama_url = QLineEdit(self.config_manager.config.get("ollama_url", "http://localhost:11434"))
         layout.addRow("Ollama Endpoint:", self.ollama_url)
         
-        layout.addWidget(QLabel("\n* Los modelos disponibles se listan automáticamente en la barra principal."))
+        layout.addWidget(QLabel("\n* Available models are automatically listed in the main toolbar."))
         return tab
 
     def _create_tools_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
-        layout.addWidget(QLabel("Habilitar/Deshabilitar Capacidades del Agente"))
+        layout.addWidget(QLabel("Enable/Disable Agent Capabilities"))
         
         self.tool_checks = {}
         tools_data = self.config_manager.config.get("tools", {})
@@ -128,8 +128,8 @@ class SettingsDialog(QDialog):
         new_id = f"agent_{len(self.config_manager.get_agents())}"
         new_agent = {
             "id": new_id,
-            "name": "Nuevo Agente",
-            "prompt": "Eres un asistente...",
+            "name": "New Agent",
+            "prompt": "You are an assistant...",
             "color": "#00f2ff"
         }
         self.config_manager.config["agents"].append(new_agent)
@@ -154,5 +154,5 @@ class SettingsDialog(QDialog):
             self.config_manager.config["tools"][tool_id] = check.isChecked()
             
         self.config_manager.save()
-        QMessageBox.information(self, "Configuraciones", "Cambios guardados con éxito.")
+        QMessageBox.information(self, "Settings", "Changes saved successfully.")
         self.accept()

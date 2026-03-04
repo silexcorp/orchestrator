@@ -1,27 +1,27 @@
-# Sistema de Memoria de Orchestrator
+# Orchestrator Memory System
 
-La versión Python de Orchestrator utiliza un sistema de memoria simplificado pero eficaz para proporcionar contexto a largo plazo.
+The Python version of Orchestrator uses a simplified but effective memory system to provide long-term context.
 
-## Capas de Memoria
+## Memory Layers
 
-### 1. Perfil de Usuario (`user_profiles.json`)
-Contiene resúmenes destilados de quién es el usuario y sus preferencias generales según lo aprendido por cada agente.
+### 1. User Profile (`user_profiles.json`)
+Contains distilled summaries of who the user is and their general preferences as learned by each agent.
 
-### 2. Memoria de Trabajo (`memory_entries.json`)
-Entradas individuales extraídas de conversaciones pasadas que contienen hechos o datos específicos.
+### 2. Working Memory (`memory_entries.json`)
+Individual entries extracted from past conversations that contain specific facts or data.
 
-## Funcionamiento Técnico
+## Technical Operation
 
-### Extracción
-Cuando una conversación finaliza o alcanza un punto de guardado, el agente analiza el historial y extrae nuevos conocimientos que se guardan como `MemoryEntry`.
+### Extraction
+When a conversation ends or reaches a save point, the agent analyzes the history and extracts new insights that are saved as a `MemoryEntry`.
 
-### Búsqueda (BM25)
-A diferencia de la versión macOS que utiliza búsqueda vectorial (Embeddings), la versión Linux actual utiliza un algoritmo de búsqueda por palabras clave **BM25**. 
+### Search (BM25)
+Unlike the macOS version which uses vector search (Embeddings), the current Linux version uses the **BM25** keyword search algorithm.
 
-Cuando realizas una pregunta, Orchestrator:
-1. Divide tu consulta en tokens.
-2. Busca en la base de datos de memoria las entradas con mayor coincidencia de términos.
-3. Inyecta los resultados más relevantes en el prompt de sistema del agente.
+When you ask a question, Orchestrator:
+1. Tokenizes your query.
+2. Searches the memory database for entries with the highest matching terms.
+3. Injects the most relevant results into the agent's system prompt.
 
-## Gestión de Datos
-Puedes ver y gestionar la memoria acumulada desde la pestaña **Memory** en la ventana de gestión de la aplicación.
+## Data Management
+You can view and manage accumulated memory from the **Memory** tab in the application's management window.

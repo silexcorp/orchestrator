@@ -1,45 +1,45 @@
-# Modo IDE y Gestión de Workspace 🖥️
+# IDE Mode and Workspace Management 🖥️
 
-Orchestrator incluye un modo de edición avanzada que transforma el chat en un entorno de desarrollo integrado (IDE).
+Orchestrator includes an advanced editing mode that transforms the chat into an Integrated Development Environment (IDE).
 
-## El Workspace
+## The Workspace
 
-El "Workspace" es el corazón del flujo de trabajo del agente. Al abrir una carpeta:
+The "Workspace" is the heart of the agent's workflow. Upon opening a folder:
 
-1.  **Exploración**: Se activa el panel lateral con el árbol de archivos.
-2.  **Contexto**: El agente genera un `Project Snapshot` que incluye:
-    *   La estructura jerárquica de archivos.
-    *   El contenido del archivo que tengas abierto actualmente.
-    *   Vistas rápidas de archivos relevantes del proyecto.
-3.  **Terminal**: La terminal integrada establece automáticamente su directorio de trabajo (`CWD`) en la raíz de la carpeta abierta.
+1.  **Exploration**: The sidebar with the file tree is activated.
+2.  **Context**: The agent generates a `Project Snapshot` that includes:
+    *   The hierarchical file structure.
+    *   The content of the file you currently have open.
+    *   Quick views of relevant project files.
+3.  **Terminal**: The integrated terminal automatically sets its working directory (`CWD`) to the root of the opened folder.
 
-## Editor Multitabs
+## Multi-Tab Editor
 
-El editor de código ahora soporta múltiples archivos mediante pestañas:
+The code editor now supports multiple files through tabs:
 
-*   **Puntos de Cambio**: Un círculo (●) en la pestaña indica que el archivo tiene cambios sin guardar.
-*   **Atajos**:
-    *   `Ctrl+S`: Guardar archivo activo.
-    *   `Ctrl+W`: Cerrar pestaña actual.
-    *   `Ctrl+Tab`: Navegar entre pestañas abiertas.
-*   **Apertura Inteligente**: Si el agente intenta editar un archivo que ya tienes abierto, el editor simplemente cambiará el foco a esa pestaña en lugar de duplicarla.
+*   **Change Indicators**: A circle (●) on the tab indicates that the file has unsaved changes.
+*   **Shortcuts**:
+    *   `Ctrl+S`: Save active file.
+    *   `Ctrl+W`: Close current tab.
+    *   `Ctrl+Tab`: Navigate between open tabs.
+*   **Smart Opening**: If the agent attempts to edit a file you already have open, the editor will simply switch focus to that tab instead of duplicating it.
 
-## Persistencia de Sesión
+## Session Persistence
 
-Orchestrator recuerda tu ritmo de trabajo. Al cerrar el programa, se guarda automáticamente en `~/.nova_editor/session.json`:
+Orchestrator remembers your work pace. When closing the program, it is automatically saved in `~/.orchestrator_ai/session.json`:
 
-*   El último workspace abierto.
-*   La lista de archivos que tenías en pestañas.
-*   El modelo de Ollama que estabas usando.
-*   El tamaño y posición de los paneles (Splitters).
+*   The last opened workspace.
+*   The list of files you had in tabs.
+*   The Ollama model you were using.
+*   The size and position of panels (Splitters).
 
-## Herramientas del Agente para el Workspace
+## Agent Tools for the Workspace
 
-El agente tiene acceso a herramientas especializadas para navegar por el proyecto:
+The agent has access to specialized tools to navigate the project:
 
-*   `list_files`: Permite al agente buscar archivos específicos mediante patrones (ej: `*.py`).
-*   `read_file`: El agente puede leer cualquier archivo del proyecto para obtener más contexto del que se le envía inicialmente.
-*   `write_file` / `edit_file`: Capacidad para realizar cambios directamente en el código.
+*   `list_files`: Allows the agent to search for specific files using patterns (e.g., `*.py`).
+*   `read_file`: The agent can read any project file to obtain more context than initially sent.
+*   `create_file` / `edit_file`: Capability to make changes directly in the code.
 
 ---
-*Nota: Este modo requiere tener Ollama instalado y corriendo para que el agente pueda razonar sobre el código.*
+*Note: This mode requires having Ollama installed and running so the agent can reason about the code.*

@@ -1,32 +1,32 @@
-# Estética Antigravity (Premium Google Style)
+# Antigravity Aesthetic (Premium Google Style)
 
-Orchestrator utiliza la identidad visual de **Antigravity**, diseñada para transmitir innovación, potencia y claridad.
+Orchestrator uses the visual identity of **Antigravity**, designed to convey innovation, power, and clarity.
 
-## Paleta de Colores
+## Color Palette
 
-- **Fondo Principal (Deep Space)**: `#05060a` - Un azul-negro profundo que reduce la fatiga visual.
-- **Acento Primario (Electric Cyan)**: `#00f2ff` - Usado para estados de enfoque, indicadores de actividad y llamadas a la acción.
-- **Acento Secundario (Galactic Purple)**: `#8a2be2` - Usado para identificar "Pensamientos Neurales" y estados de usuario.
-- **Gradientes**: Botón de envío con gradiente lineal de Cian a Púrpura, representando la fusión de lógica y creatividad.
+- **Main Background (Deep Space)**: `#05060a` - A deep blue-black that reduces eye fatigue.
+- **Primary Accent (Electric Cyan)**: `#00f2ff` - Used for focus states, activity indicators, and calls to action.
+- **Secondary Accent (Galactic Purple)**: `#8a2be2` - Used to identify "Neural Thoughts" and user states.
+- **Gradients**: Send button with a linear gradient from Cyan to Purple, representing the fusion of logic and creativity.
 
-## Componentes UI Clave
+## Key UI Components
 
 ### 1. Glowing Capsule Input
-El área de entrada de texto no es un simple cuadro de texto; es una cápsula diseñada con un borde reactivo que aumenta su brillo (glow cian) cuando el usuario interactúa con ella.
+The text input area is not a simple text box; it is a capsule designed with a reactive border that increases its glow (cyan glow) when the user interacts with it.
 
 ### 2. Neural Activity Log
-Ubicado en la parte inferior derecha, este panel proporciona una ventana directa al proceso cognitivo del agente. Los logs están categorizados por colores:
-- **Púrpura**: Pensamientos del modelo.
-- **Cian**: Acciones del sistema (Tools).
-- **Verde**: Observaciones y datos de sensores.
-- **Rojo**: Errores críticos.
+Located in the bottom right, this panel provides a direct window into the agent's cognitive process. Logs are categorized by colors:
+- **Purple**: Model thoughts.
+- **Cyan**: System actions (Tools).
+- **Green**: Observations and sensor data.
+- **Red**: Critical errors.
 
 ### 3. Responsive Chat Layout
-El chat se adapta dinámicamente al ancho disponible en el panel derecho. Las burbujas de mensaje aprovechan el espacio horizontal para maximizar la legibilidad del código y las explicaciones extensas.
+The chat dynamically adapts to the available width in the right panel. Message bubbles leverage horizontal space to maximize readability of code and long explanations.
 
 ### 4. Settings Dashboard (Dynamic Control)
-La ventana de configuraciones extiende el lenguaje visual con un diseño de pestañas limpio y formularios integrados que permiten gestionar la "personalidad" de la IA sin salir de la estética premium.
+The settings window extends the visual language with a clean tabbed design and integrated forms that allow managing the IA's "personality" without leaving the premium aesthetic.
 
-## Implementación Técnica
+## Technical Implementation
 
-Los estilos están centralizados en `styles.py` y aplicados dinámicamente mediante hojas de estilo de Qt (QSS). Se utilizan transparencias (alfa), bordes redondeados (14px - 28px) y tipografías sans-serif modernas para mantener una estética suave y vanguardista.
+Styles are centralized in `styles.py` and dynamically applied through Qt Style Sheets (QSS). Transparencies (alpha), rounded borders (14px - 28px), and modern sans-serif typefaces are used to maintain a smooth and avant-garde aesthetic.

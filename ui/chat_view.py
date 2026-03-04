@@ -196,7 +196,7 @@ class ChatView(QWidget):
         self.input = _StreamInputField()
         self.input.setObjectName("inputField")
         self.input.setStyleSheet("background: transparent; border: none; padding: 12px 0; color: #f0f4f8;")
-        self.input.setPlaceholderText("How can I hellp you today?")
+        self.input.setPlaceholderText("How can I help you today?")
         self.input.setFixedHeight(50)
         self.input.setMaximumHeight(200)
         inp_layout.addWidget(self.input, 1)
@@ -365,7 +365,7 @@ class ChatView(QWidget):
         error_html = (
             f"<div style='background:#2a1520; border:1px solid #7c2a3a; padding:10px; border-radius:5px;'>"
             f"<span style='color:#ff8888'>⚠ Error: {msg}</span><br><br>"
-            "<code>¿Está Ollama corriendo?  →  <b>ollama serve</b></code>"
+            "<code>Is Ollama running?  →  <b>ollama serve</b></code>"
             f"</div>"
         )
         if self._current_ai_bubble:

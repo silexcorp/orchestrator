@@ -93,27 +93,27 @@ class MainWindow(QMainWindow):
         self.addToolBar(toolbar)
 
         # File Actions
-        file_menu = self.menuBar().addMenu("&Archivo")
+        file_menu = self.menuBar().addMenu("&File")
         
-        open_folder_act = QAction("Abrir Carpeta...", self)
+        open_folder_act = QAction("Open Folder...", self)
         open_folder_act.setShortcut("Ctrl+Shift+O")
         open_folder_act.triggered.connect(self._open_folder_dialog)
         file_menu.addAction(open_folder_act)
         toolbar.addAction(open_folder_act)
 
-        save_act = QAction("Guardar", self)
+        save_act = QAction("Save", self)
         save_act.setShortcut("Ctrl+S")
         save_act.triggered.connect(self.editor.save_file)
         file_menu.addAction(save_act)
         toolbar.addAction(save_act)
         
-        self.recent_menu = file_menu.addMenu("Carpetas Recientes")
+        self.recent_menu = file_menu.addMenu("Recent Folders")
         self._update_recent_menu()
 
         # Edit Actions
-        edit_menu = self.menuBar().addMenu("&Edición")
+        edit_menu = self.menuBar().addMenu("&Edit")
         
-        settings_act = QAction("Configuraciones...", self)
+        settings_act = QAction("Settings...", self)
         settings_act.setShortcut("Ctrl+,")
         settings_act.triggered.connect(self._show_settings)
         edit_menu.addAction(settings_act)
@@ -121,7 +121,7 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
 
         # Model Selector
-        toolbar.addWidget(QLabel(" Modelo: "))
+        toolbar.addWidget(QLabel(" Model: "))
         self.model_combo = QComboBox()
         self.model_combo.setFixedWidth(150)
         self.model_combo.currentTextChanged.connect(self._on_model_changed)
@@ -142,7 +142,7 @@ class MainWindow(QMainWindow):
         self.conn_timer.start(5000)
 
     def _open_folder_dialog(self):
-        path = QFileDialog.getExistingDirectory(self, "Seleccionar Carpeta")
+        path = QFileDialog.getExistingDirectory(self, "Select Folder")
         if path:
             self._open_workspace(path)
 
@@ -214,8 +214,8 @@ class MainWindow(QMainWindow):
         for i in range(self.editor.count()):
             editor = self.editor.widget(i)
             if editor.dirty:
-                res = QMessageBox.question(self, "Guardar cambios", 
-                                         f"¿Deseas guardar los cambios en {os.path.basename(editor.file_path)}?",
+                res = QMessageBox.question(self, "Save changes", 
+                                         f"Do you want to save changes in {os.path.basename(editor.file_path)}?",
                                          QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
                 if res == QMessageBox.StandardButton.Save:
                     self.editor.save_file(i)

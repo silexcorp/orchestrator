@@ -1,40 +1,40 @@
-# Habilidades (Skills)
+# Skills
 
-Las habilidades son paquetes de instrucciones y contexto que proporcionan al agente experiencia especializada.
+Skills are packages of instructions and context that provide the agent with specialized expertise.
 
 ---
 
-## Uso de Habilidades
+## Using Skills
 
-1. Abre la ventana de gestión (**Ctrl + Shift + M**) → pestaña **Skills**.
-2. Verás las habilidades disponibles en tu carpeta local.
-3. Puedes importar nuevas habilidades haciendo clic en el botón **Import...** y seleccionando un archivo Markdown.
+1. Open the management window (**Ctrl + Shift + M**) → **Skills** tab.
+2. You will see the available skills in your local folder.
+3. You can import new skills by clicking the **Import...** button and selecting a Markdown file.
 
-### Ubicación de archivos
-Las habilidades se guardan como archivos `.md` en:
+### File Location
+Skills are saved as `.md` files in:
 `~/.config/orchestrator/skills/`
 
 ---
 
-## Creación de Habilidades
+## Creating Skills
 
-Puedes crear tus propias habilidades escribiendo un archivo Markdown con el siguiente formato sugerido:
+You can create your own skills by writing a Markdown file with the following suggested format:
 
 ```markdown
-# [Nombre de la Habilidad]
+# [Skill Name]
 
-Eres un experto en [campo específico]. 
+You are an expert in [specific field]. 
 
-## Metodología
-1. Identifica el problema.
-2. Aplica [técnica específica].
-3. Formatea la respuesta como [formato deseado].
+## Methodology
+1. Identify the problem.
+2. Apply [specific technique].
+3. Format the response as [desired format].
 ```
 
-Una vez guardado en la carpeta de `skills/`, aparecerá automáticamente en Orchestrator.
+Once saved in the `skills/` folder, it will automatically appear in Orchestrator.
 
 ---
 
-## Selección Inteligente de Capacidades
+## Smart Capability Selection
 
-Para ahorrar tokens, Orchestrator no envía todas las instrucciones de todas las habilidades en cada mensaje. Solo carga el contenido completo de las habilidades que el agente determine necesarias para la tarea actual según el contexto inicial.
+To save tokens, Orchestrator does not send all instructions for all skills in every message. It only loads the full content of the skills that the agent determines are necessary for the current task based on the initial context.

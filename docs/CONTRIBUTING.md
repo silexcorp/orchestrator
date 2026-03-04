@@ -1,44 +1,42 @@
-# Contribuyendo a Orchestrator (Python)
+# Contributing to Orchestrator (Python)
 
-¡Gracias por tu interés en mejorar Orchestrator para Linux! Al ser ahora un proyecto basado en Python y PyQt6, contribuir es más sencillo que nunca.
+Thank you for your interest in improving Orchestrator for Linux! As it is now a project based on Python and PyQt6, contributing is easier than ever.
 
-## Requisitos de Desarrollo
+## Development Requirements
 
 1. **Python 3.10+**
-2. **Ollama** para pruebas locales.
-3. **PyQt6** para el desarrollo de la interfaz.
+2. **Ollama** for local testing.
+3. **PyQt6** for interface development.
 
-## Configuración del Entorno
+## Environment Setup
 
-1. Clona el repositorio.
-2. Crea un entorno virtual en `orchestrator/venv`:
+1. Clone the repository.
+2. Create a virtual environment in `venv`:
    ```bash
-   cd orchestrator
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
 
-## Estructura del Código
+## Code Structure
 
-- **`orchestrator/models/`**: Si necesitas añadir nuevos datos o campos persistentes.
-- **`orchestrator/core/`**: Para lógica de backend, nuevos servicios de inferencia o mejoras en el motor MCP.
-- **`orchestrator/ui/`**: Para cambios visuales o nuevas pestañas en la ventana de gestión.
-- **`orchestrator/styles.py`**: Contiene el CSS global de la aplicación.
+- **`core/`**: For backend logic, new inference services, or improvements to the tool execution engine.
+- **`ui/`**: For visual changes or new tabs in the settings dialog.
+- **`ui/styles.py`**: Contains the global CSS for the application (if applicable).
 
-## Guías de Estilo
+## Style Guides
 
-- **PEP 8**: Seguimos las convenciones estándar de Python.
-- **Modern UI**: Mantén la estética "Dark/Purple" premium. Usa los tokens de color definidos en `styles.py`.
-- **Hilos**: Cualquier operación de red o inferencia debe ejecutarse en un hilo separado para no bloquear la interfaz (ver `ChatEngine` como ejemplo).
+- **PEP 8**: We follow standard Python conventions.
+- **Modern UI**: Maintain the premium "Deep Space" aesthetic. Use the color tokens defined in the styling system.
+- **Threads**: Any network or inference operation must run in a separate thread to avoid blocking the interface (see `Agent` as an example).
 
-## Reporte de Bugs
+## Bug Reporting
 
-Si encuentras un error, por favor abre un Issue detallando:
-1. Tu distribución de Linux.
-2. Versión de Python y Ollama.
-3. El traceback del error si está disponible.
+If you find an error, please open an Issue detailing:
+1. Your Linux distribution.
+2. Python and Ollama versions.
+3. The error traceback if available.
 
 ---
 
-Orchestrator es un proyecto de código abierto bajo la licencia MIT.
+Orchestrator is an open-source project under the GPL-3.0 license.

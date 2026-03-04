@@ -1,52 +1,52 @@
-# Watchers (Monitores de Carpetas)
+# Watchers (Folder Monitors)
 
-Orchestrator Watchers monitorean carpetas en busca de cambios en el sistema de archivos y activan automáticamente tareas de agentes de IA.
-
----
-
-## Resumen
-
-Los Watchers permiten la automatización basada en eventos. Mientras que los **Schedules** se ejecutan por tiempo, los **Watchers** reaccionan a eventos reales: archivos creados, modificados o eliminados.
-
-Casos de uso comunes:
-- **Organización de archivos**: Ordenar y renombrar archivos automáticamente al aparecer.
-- **Procesamiento de contenido**: Analizar o resumir documentos cuando se añaden a una carpeta.
-- **Flujos de trabajo**: Disparar tareas complejas de IA al soltar archivos en un directorio.
+Orchestrator Watchers monitor folders for filesystem changes and automatically trigger AI agent tasks.
 
 ---
 
-## Cómo empezar
+## Overview
 
-### Crear un Watcher
-1. Abre la ventana de gestión (**Ctrl + Shift + M**).
-2. Ve a la pestaña **Watchers**.
-3. Rellena la configuración:
-   - **Path**: La ruta absoluta de la carpeta a monitorear.
-   - **Recursive**: Marca esta opción si quieres monitorear también las subcarpetas.
-4. Haz clic en **Add Watcher**.
+Watchers enable event-based automation. While **Schedules** run based on time, **Watchers** react to real events: files being created, modified, or deleted.
 
----
-
-## Funcionamiento Técnico
-
-### Detección con Watchdog
-En Linux, Orchestrator utiliza la librería `watchdog` para monitorear eventos del kernel. Es eficiente y consume pocos recursos.
-
-### Debounce (Anti-rebote)
-Orchestrator espera un breve periodo (por defecto 1 segundo) después de detectar cambios antes de activar al agente. Esto evita que el agente se dispare múltiples veces mientras un archivo grande se está copiando o descargando.
-
-### Ciclo de Convergencia
-Para evitar bucles infinitos (por ejemplo, si el agente mueve un archivo dentro de la misma carpeta que vigila), Orchestrator incluye lógica para detectar si los cambios fueron causados por la propia aplicación.
+Common use cases:
+- **File Organization**: Automatically sort and rename files as they appear.
+- **Content Processing**: Analyze or summarize documents when they are added to a folder.
+- **Workflows**: Trigger complex AI tasks by dropping files into a directory.
 
 ---
 
-## Solución de Problemas
+## How to Get Started
 
-### El Watcher no se dispara
-- Verifica que la ruta de la carpeta sea correcta y tengas permisos de lectura.
-- Asegúrate de que el proceso principal de Orchestrator tenga permisos para acceder a esa ubicación.
-- Si el cambio ocurre en una subcarpeta, asegúrate de haber activado la opción **Recursive**.
+### Create a Watcher
+1. Open the management window (**Ctrl + Shift + M**).
+2. Go to the **Watchers** tab.
+3. Fill in the configuration:
+   - **Path**: The absolute path of the folder to monitor.
+   - **Recursive**: Check this option if you want to monitor subfolders as well.
+4. Click **Add Watcher**.
 
-### El agente se ejecuta demasiadas veces
-- Para carpetas con cambios muy frecuentes, considera usar un agente con instrucciones que ignoren archivos ya procesados.
-- Verifica que el agente no esté creando nuevos archivos que a su vez disparen el mismo watcher en un bucle.
+---
+
+## Technical Details
+
+### Detection with Watchdog
+On Linux, Orchestrator uses the `watchdog` library to monitor kernel events. It is efficient and consumes few resources.
+
+### Debounce
+Orchestrator waits for a short period (default 1 second) after detecting changes before triggering the agent. This prevents the agent from triggering multiple times while a large file is being copied or downloaded.
+
+### Convergence Cycle
+To avoid infinite loops (for example, if the agent moves a file within the same folder it is watching), Orchestrator includes logic to detect if changes were caused by the application itself.
+
+---
+
+## Troubleshooting
+
+### The Watcher does not trigger
+- Verify that the folder path is correct and you have read permissions.
+- Ensure that the main Orchestrator process has permissions to access that location.
+- If the change occurs in a subfolder, ensure you have enabled the **Recursive** option.
+
+### The agent runs too many times
+- For folders with very frequent changes, consider using an agent with instructions that ignore already processed files.
+- Verify that the agent is not creating new files that in turn trigger the same watcher in a loop.

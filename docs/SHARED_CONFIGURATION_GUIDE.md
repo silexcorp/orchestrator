@@ -1,34 +1,29 @@
-# Configuración Compartida (Linux)
+# Shared Configuration (Linux)
 
-Orchestrator en Linux utiliza el directorio estándar de XDG para guardar toda su configuración y datos persistentes.
+Orchestrator on Linux uses a centralized directory to save all its configuration and persistent data.
 
-## Ubicación de archivos
+## File Location
 
-Por defecto, todo se guarda en:
-`~/.config/orchestrator/`
+By default, everything is saved in:
+`~/.orchestrator_ai/`
 
-### Archivos clave
+### Key Files
 
-| Archivo | Descripción |
+| File | Description |
 | :--- | :--- |
-| **`agents.json`** | Lista de agentes configurados, incluyendo sus prompts, modelos por defecto y temas visuales. |
-| **`providers.json`** | Configuración de proveedores remotos (API Keys, URLs base de OpenAI/Anthropic). |
-| **`sessions.json`** | Historial de conversaciones locales. |
-| **`insights.json`** | Logs de rendimiento de las últimas 500 inferencias. |
-| **`memory_entries.json`**| Entradas de memoria de trabajo extraídas de los chats. |
-| **`user_profiles.json`** | Resúmenes de perfiles de usuario por agente. |
-| **`skills/`** | Carpeta que contiene archivos `.md` de habilidades importadas. |
+| **`config.json`** | Main configuration file. Includes agent profiles, tools state, and preferred models. |
+| **`session.json`**| Stores the state of the last session (open tabs, workspace path, window layout). |
 
-## Edición Manual
+## Manual Editing
 
-Aunque se recomienda usar la interfaz de **Management (Ctrl+Shift+M)**, los archivos JSON pueden editarse manualmente. Asegúrate de cerrar Orchestrator antes de editarlos para evitar que los cambios sean sobrescritos por el programa al salir.
+While it is recommended to use the **Settings (Ctrl+,)** interface, JSON files can be edited manually. Ensure Orchestrator is closed before editing them to prevent changes from being overwritten by the program upon exit.
 
-## Entorno Virtual
+## Virtual Environment
 
-La aplicación se ejecuta dentro de un entorno virtual localizado en:
-`orchestrator/venv/`
+The application runs within a virtual environment located in the project root:
+`venv/`
 
-Para instalar nuevas librerías manualmente:
+To install new libraries manually:
 ```bash
-./orchestrator/venv/bin/pip install <libreria>
+./venv/bin/pip install <library>
 ```

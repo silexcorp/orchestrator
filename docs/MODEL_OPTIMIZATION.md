@@ -1,27 +1,27 @@
-# Optimización de Modelos y Robustez de Respuesta
+# Model Optimization and Response Robustness
 
-Orchestrator incluye mecanismos avanzados para la gestión eficiente de recursos y la resiliencia en la comunicación con modelos locales (Ollama).
+Orchestrator includes advanced mechanisms for efficient resource management and resilience in communication with local models (Ollama).
 
-## 1. Liberación Automática de Memoria (VRAM/RAM)
+## 1. Automatic Memory Release (VRAM/RAM)
 
-Para maximizar el rendimiento del sistema, Orchestrator se asegura de no dejar modelos "colgados" en la memoria después de cerrar la aplicación.
+To maximize system performance, Orchestrator ensures it does not leave models "hanging" in memory after the application is closed.
 
-### Funcionamiento
-- Al detectar el evento de cierre (`closeEvent`), el cliente de Ollama envía una solicitud con el parámetro `keep_alive: 0`.
-- Esto instruye al servidor de Ollama a descargar el modelo inmediatamente de los tensores de la GPU o la memoria RAM.
-- **Beneficio**: El sistema recupera gigabytes de memoria instantáneamente para otras aplicaciones.
+### How it Works
+- Upon detecting the closure event (`closeEvent`), the Ollama client sends a request with the parameter `keep_alive: 0`.
+- This instructs the Ollama server to unload the model immediately from GPU tensors or RAM.
+- **Benefit**: The system recovers gigabytes of memory instantly for other applications.
 
-## 2. Parsing de JSON Robusto y Reparación Estructural
+## 2. Robust JSON Parsing and Structural Repair
 
-Los modelos locales a veces pueden generar respuestas malformadas debido a la cuantización o detenciones inesperadas. Orchestrator implementa un motor de extracción de JSON resiliente.
+Local models can sometimes generate malformed responses due to quantization or unexpected stops. Orchestrator implements a resilient JSON extraction engine.
 
-### Capacidades de Reparación
-- **Trailing Commas**: Elimina automáticamente comas sobrantes al final de objetos o listas, que suelen romper el estándar JSON.
-- **Balanceo de Estructuras**: Si una respuesta se corta antes de tiempo (truncamiento), el motor cuenta las llaves `{` y corchetes `[` abiertos y añade los cierres correspondientes `}` `]` para intentar salvar la mayor parte del mensaje.
-- **Extracción Inteligente**: Busca patrones de bloques de código Markdown (```json) y, en su defecto, utiliza un algoritmo de búsqueda de primer y último delimitador.
+### Repair Capabilities
+- **Trailing Commas**: Automatically removes extra commas at the end of objects or lists, which typically break the JSON standard.
+- **Structure Balancing**: If a response is cut off prematurely (truncation), the engine counts open braces `{` and brackets `[` and adds the corresponding closures `}` `]` to attempt to save as much of the message as possible.
+- **Smart Extraction**: Searches for Markdown code block patterns (```json) and, failing that, uses a search algorithm for first and last delimiters.
 
-## 3. Configuración del System Prompt
+## 3. System Prompt Configuration
 
-El "cerebro" del agente ha sido reforzado con instrucciones específicas para minimizar errores de formato:
-- Obligatoriedad de formato JSON estricto.
-- Prohibición de incluir caracteres de control innecesarios o comas finales.
+The agent's "brain" has been reinforced with specific instructions to minimize formatting errors:
+- Mandatory strict JSON format.
+- Prohibition of including unnecessary control characters or trailing commas.

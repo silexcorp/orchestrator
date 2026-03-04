@@ -1,12 +1,12 @@
-# Guía de API de Orchestrator
+# Orchestrator API Guide
 
-Orchestrator expone una API compatible con OpenAI que permite integrar tus modelos locales y remotos en otras aplicaciones.
+Orchestrator exposes an OpenAI-compatible API that allows you to integrate your local and remote models into other applications.
 
-## Endpoints Disponibles
+## Available Endpoints
 
-### 1. Listar Modelos - `GET /v1/models`
+### 1. List Models - `GET /v1/models`
 
-Devuelve los modelos disponibles (tanto locales de Ollama como proveedores remotos configurados).
+Returns available models (both local from Ollama and configured remote providers).
 
 ```bash
 curl http://127.0.0.1:8080/v1/models
@@ -14,9 +14,9 @@ curl http://127.0.0.1:8080/v1/models
 
 ### 2. Chat Completions - `POST /v1/chat/completions`
 
-Genera respuestas utilizando el modelo especificado. Soporta streaming.
+Generates responses using the specified model. Supports streaming.
 
-#### Ejemplo de Petición (Streaming)
+#### Request Example (Streaming)
 
 ```bash
 curl http://127.0.0.1:8080/v1/chat/completions \
@@ -24,16 +24,16 @@ curl http://127.0.0.1:8080/v1/chat/completions \
   -d '{
     "model": "llama3",
     "messages": [
-      {"role": "user", "content": "Hola, ¿quién eres?"}
+      {"role": "user", "content": "Hello, who are you?"}
     ],
     "stream": true,
     "temperature": 0.7
   }'
 ```
 
-## Integración con Librerías Oficiales
+## Integration with Official Libraries
 
-Puedes usar el SDK oficial de OpenAI apuntando al servidor de Orchestrator:
+You can use the official OpenAI SDK by pointing to the Orchestrator server:
 
 ```python
 from openai import OpenAI
@@ -45,22 +45,22 @@ client = OpenAI(
 
 response = client.chat.completions.create(
     model="llama3",
-    messages=[{"role": "user", "content": "Dime un chiste"}]
+    messages=[{"role": "user", "content": "Tell me a joke"}]
 )
 
 print(response.choices[0].message.content)
 ```
 
-## Configuración del Servidor
+## Server Configuration
 
-El servidor se controla desde la pestaña **Server** en la ventana de gestión.
-- **Puerto por defecto**: 8080
+The server is controlled from the **Server** tab in the application's management window.
+- **Default Port**: 8080
 - **Host**: 127.0.0.1 (Localhost)
 
 ---
 
-## Notas Técnicas
+## Technical Notes
 
-- **Ollama**: Asegúrate de que Ollama esté corriendo para que los modelos locales respondan correctamente.
-- **Proveedores Remotos**: La API de Orchestrator actuará como proxy, usando las API Keys que hayas configurado en la aplicación.
-- **Rendimiento**: La velocidad de respuesta depende de tu hardware local (para Ollama) o de tu conexión a internet (para remotos).
+- **Ollama**: Ensure Ollama is running for local models to respond correctly.
+- **Remote Providers**: The Orchestrator API will act as a proxy, using the API Keys you have configured in the application.
+- **Performance**: Response speed depends on your local hardware (for Ollama) or your internet connection (for remotes).

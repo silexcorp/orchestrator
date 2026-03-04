@@ -103,12 +103,12 @@ class FileTreeWidget(QTreeWidget):
         menu = QMenu()
         
         if os.path.isfile(path):
-            open_act = menu.addAction("Abrir")
+            open_act = menu.addAction("Open")
             open_act.triggered.connect(lambda: self.file_clicked.emit(path))
         
-        rename_act = menu.addAction("Renombrar")
-        delete_act = menu.addAction("Eliminar")
-        copy_path_act = menu.addAction("Copiar ruta")
+        rename_act = menu.addAction("Rename")
+        delete_act = menu.addAction("Delete")
+        copy_path_act = menu.addAction("Copy path")
         
         action = menu.exec(self.viewport().mapToGlobal(position))
         

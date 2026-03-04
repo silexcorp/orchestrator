@@ -1,47 +1,47 @@
-# Agentes (Trabajo Autónomo)
+# Agents (Autonomous Work)
 
-Los Agentes de Orchestrator permiten la ejecución de tareas complejas de forma autónoma, con seguimiento de problemas (issues), planificación y operaciones de archivos integradas.
-
----
-
-## Cómo empezar
-
-### Acceso
-1. En la ventana de chat, selecciona la pestaña **Agent**.
-2. Verás la interfaz de "Work Mode" con un panel lateral para el seguimiento de tareas.
-
-### Directorio de Trabajo
-Antes de que un agente realice operaciones de archivos:
-1. Haz clic en **Archivo -> Abrir Carpeta** (`Ctrl+Shift+O`).
-2. Elige el directorio raíz de tu proyecto.
-El `WorkspaceManager` se encargará de establecer la raíz y el agente recibirá automáticamente un **snapshot** de la estructura del proyecto y el contenido del archivo activo para actuar con contexto completo.
+Orchestrator Agents allow the execution of complex tasks autonomously, with issue tracking, planning, and integrated file operations.
 
 ---
 
-## Conceptos Clave
+## How to Start
 
-### Ciclo de Razonamiento
-El agente entra en un bucle iterativo (máximo 30 pasos):
-1. **Observa**: Analiza el estado actual o el resultado de la última acción.
-2. **Piensa**: Determina el siguiente paso lógico.
-3. **Actúa**: Llama a una herramienta (leer archivo, editar código, ejecutar shell).
-4. **Verifica**: Evalúa si el paso fue exitoso.
+### Access
+1. In the chat window, select the **Agent** tab.
+2. You will see the "Work Mode" interface with a sidebar for task tracking.
 
-### Seguimiento de Issues
-Las tareas se desglosan en "Issues" (pendientes, en progreso, bloqueadas, cerradas). El agente actualizará estos estados automáticamente a medida que avance.
-
----
-
-## Herramientas Disponibles
-
-- **Archivos**: `file_read`, `file_edit`, `file_write`, `file_search`, `file_tree`, `list_files`.
-- **Sistema**: `shell_run` (requiere aprobación si es comando destructivo), `dir_create`.
-- **Git**: `git_status`, `git_diff`, `git_commit`.
+### Working Directory
+Before an agent performs file operations:
+1. Click on **File -> Open Folder** (`Ctrl+Shift+O`).
+2. Choose the root directory of your project.
+The `WorkspaceManager` will handle setting the root, and the agent will automatically receive a **snapshot** of the project structure and the content of the active file to act with full context.
 
 ---
 
-## Mejores Prácticas
+## Key Concepts
 
-- **Instrucciones claras**: Sé específico ("Añade un botón de logout en el componente Navbar" es mejor que "Arregla la UI").
-- **Control manual**: Puedes pausar al agente en cualquier momento o cerrar hilos de ejecución desde la ventana de gestión.
-- **Historial**: Todos los cambios de archivos quedan registrados; puedes consultarlos en el log de la sesión.
+### Reasoning Cycle
+The agent enters an iterative loop (maximum 30 steps):
+1. **Observe**: Analyzes the current state or the result of the last action.
+2. **Think**: Determines the next logical step.
+3. **Act**: Calls a tool (read file, edit code, execute shell).
+4. **Verify**: Evaluates if the step was successful.
+
+### Issue Tracking
+Tasks are broken down into "Issues" (pending, in progress, blocked, closed). The agent will update these states automatically as it progresses.
+
+---
+
+## Available Tools
+
+- **Files**: `read_file`, `edit_file`, `create_file`, `list_files`.
+- **System**: `run_command` (requires approval if it's a destructive command).
+- **Project**: `workspace_snapshot`.
+
+---
+
+## Best Practices
+
+- **Clear instructions**: Be specific ("Add a logout button in the Navbar component" is better than "Fix the UI").
+- **Manual control**: You can pause the agent at any time or close execution threads from the management window.
+- **History**: All file changes are logged; you can consult them in the session log.

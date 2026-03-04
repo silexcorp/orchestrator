@@ -15,7 +15,7 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 - **Robust JSON Parsing**: Advanced agent response extraction with structural repair logic to handle truncated or malformed JSON from models.
 - **Session Persistence**: Automatically restores your last workspace, open tabs, window layout, and preferred Ollama model.
 - **Agent Log Panel**: Real-time activity log in the bottom right, monitoring "Neural Thoughts", Actions, and Sensor Data.
-- **Dynamic Agent Profiles & Settings**: Create and edit multiple agent personalities via the new "Edición -> Configuraciones" menu.
+- **Dynamic Agent Profiles & Settings**: Create and edit multiple agent personalities via the new "Edit -> Settings" menu.
 - **Chat Aesthetic**: Premium "Deep Space" visual identity with vibrant cyan/purple accents, responsive chat, and glowing capsule-style input.
 - **Model Selector**: Switch between local Ollama models on the fly.
 

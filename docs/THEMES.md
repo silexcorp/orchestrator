@@ -1,20 +1,20 @@
-# Temas en Orchestrator (Linux)
+# Themes in Orchestrator (Linux)
 
-Orchestrator utiliza un sistema de estilos basado en CSS (QSS) para controlar la apariencia de la aplicación.
+Orchestrator uses a CSS-based (QSS) styling system to control the application's appearance.
 
-## Personalización Visual
+## Visual Customization
 
-A diferencia de la versión macOS, la versión Linux utiliza hojas de estilo altamente personalizables localizadas en `orchestrator/styles.py`.
+Unlike the macOS version, the Linux version uses highly customizable style sheets located in `orchestrator/styles.py`.
 
-### Colores del Tema
-Puedes modificar los colores base en la configuración o editando los valores de CSS. Los componentes principales incluyen:
+### Theme Colors
+You can modify the base colors in the configuration or by editing the CSS values. The main components include:
 
-- **Fondo Primario**: El fondo oscuro de la aplicación.
-- **Acento**: Color para botones disparadores y enlaces (Púrpura por defecto).
-- **Texto**: Optimizado para lectura en pantallas modernas.
+- **Primary Background**: The dark application background.
+- **Accent**: Color for trigger buttons and links (Purple by default).
+- **Text**: Optimized for reading on modern screens.
 
-## Efectos de Transparencia
-En Linux, la transparencia depende de tu gestor de ventanas (Compositor). Orchestrator intenta aplicar efectos de opacidad y degradados para imitar una estética moderna y premium.
+## Transparency Effects
+On Linux, transparency depends on your window manager (Compositor). Orchestrator attempts to apply opacity and gradient effects to mimic a modern and premium aesthetic.
 
-## Fuentes
-Se recomienda el uso de **Inter** o **Roboto** para la UI y una fuente monoespaciada como **JetBrains Mono** o **Fira Code** para los bloques de código.
+## Fonts
+The use of **Inter** or **Roboto** is recommended for the UI, and a monospaced font like **JetBrains Mono** or **Fira Code** for code blocks.
