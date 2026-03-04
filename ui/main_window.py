@@ -1,230 +1,175 @@
-"""
-main_window.py — Top-level QMainWindow: sidebar + chat view + menu bar.
-"""
-from __future__ import annotations
-
-import time
-from typing import Optional
-
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QAction, QKeySequence, QFont, QIcon
+import os
 from PyQt6.QtWidgets import (
-    QMainWindow, QWidget, QHBoxLayout, QSplitter,
-    QApplication, QMessageBox,
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
+    QPushButton, QComboBox, QLabel, QFileDialog, QToolBar,
+    QStatusBar, QApplication, QMessageBox, QSizePolicy
 )
+from PyQt6.QtCore import Qt, QSize, QTimer
+from PyQt6.QtGui import QAction, QKeySequence, QIcon
 
-from ui.sidebar import Sidebar
-from ui.chat_view import ChatView
-from ui.management_window import ManagementWindow
-from core.agent_store import agent_store, provider_store, session_store
-from core.model_service import router as model_router, RemoteProviderService, AnthropicService
-from core.insights_service import insights
-from models.chat_session import ChatSession
-from models.agent import DEFAULT_AGENT
+from ui.editor_widget import EditorWidget
+from ui.terminal_widget import TerminalWidget
+from ui.chat_widget import AgentChatWidget
+from core.ollama_client import OllamaClient
 
+WORKSPACE_PATH = os.path.expanduser("~/nova_workspace")
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Orchestrator")
-        self.resize(1200, 780)
-        self._current_session: Optional[ChatSession] = None
-        self._mgmt_window: Optional[ManagementWindow] = None
+        self.setWindowTitle("Orchestrator AI Code Editor")
+        self.resize(1200, 800)
+        
+        if not os.path.exists(WORKSPACE_PATH):
+            os.makedirs(WORKSPACE_PATH)
 
+        self.ollama_client = OllamaClient()
+        
         self._setup_ui()
-        self._setup_menu()
-        self._refresh_providers()
-        self._load_sessions()
-        self._new_chat()
-        QTimer.singleShot(200, self._refresh_models)
+        self._setup_toolbar()
+        self._connect_signals()
+        
+        # Initial refresh
+        QTimer.singleShot(500, self.refresh_models)
+        self.check_ollama_status()
+        self.status_timer = QTimer(self)
+        self.status_timer.timeout.connect(self.check_ollama_status)
+        self.status_timer.start(5000)
 
-    # ── UI Setup ──────────────────────────────────────────────────────────────
-
-    def _setup_ui(self) -> None:
+    def _setup_ui(self):
         central = QWidget()
         self.setCentralWidget(central)
-        root = QHBoxLayout(central)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(0)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
-        splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.setHandleWidth(1)
-        splitter.setChildrenCollapsible(False)
+        # Main Vertical Splitter (Editor+Chat vs Terminal)
+        self.v_splitter = QSplitter(Qt.Orientation.Vertical)
+        
+        # Horizontal Splitter (Editor vs Chat)
+        self.h_splitter = QSplitter(Qt.Orientation.Horizontal)
+        
+        self.editor = EditorWidget()
+        self.chat = AgentChatWidget(WORKSPACE_PATH)
+        
+        self.h_splitter.addWidget(self.editor)
+        self.h_splitter.addWidget(self.chat)
+        self.h_splitter.setSizes([700, 500])
+        
+        self.terminal = TerminalWidget(WORKSPACE_PATH)
+        self.terminal.setMinimumHeight(150)
+        
+        self.v_splitter.addWidget(self.h_splitter)
+        self.v_splitter.addWidget(self.terminal)
+        self.v_splitter.setSizes([600, 200])
+        
+        layout.addWidget(self.v_splitter)
 
-        self.sidebar = Sidebar()
-        self.sidebar.setMinimumWidth(200)
-        self.sidebar.setMaximumWidth(300)
-        splitter.addWidget(self.sidebar)
+    def _setup_toolbar(self):
+        toolbar = QToolBar("Main Toolbar")
+        toolbar.setIconSize(QSize(16, 16))
+        self.addToolBar(toolbar)
 
-        self.chat_view = ChatView()
-        splitter.addWidget(self.chat_view)
+        # File actions
+        open_act = QAction("Abrir", self)
+        open_act.setShortcut(QKeySequence("Ctrl+O"))
+        open_act.triggered.connect(self.open_file_dialog)
+        toolbar.addAction(open_act)
 
-        splitter.setSizes([240, 960])
-        root.addWidget(splitter)
+        save_act = QAction("Guardar", self)
+        save_act.setShortcut(QKeySequence("Ctrl+S"))
+        save_act.triggered.connect(self.save_file)
+        toolbar.addAction(save_act)
 
-        # ── Signal connections ────────────────────────────────────────────────
-        self.sidebar.new_chat_requested.connect(self._new_chat)
-        self.sidebar.session_selected.connect(self._on_session_selected)
-        self.sidebar.session_delete_requested.connect(self._delete_session)
-        self.sidebar.agent_changed.connect(self._on_agent_changed)
-        self.sidebar.model_changed.connect(self._on_model_changed)
+        toolbar.addSeparator()
 
-        self.chat_view.message_submitted.connect(self._on_message_submitted)
+        # Execute actions
+        self.exec_btn = QPushButton("▶ Ejecutar")
+        self.exec_btn.setStyleSheet("background-color: #3fb950; color: white; border-radius: 4px; padding: 4px 8px;")
+        self.exec_btn.clicked.connect(self.run_current_file)
+        toolbar.addWidget(self.exec_btn)
 
-    def _setup_menu(self) -> None:
-        mb = self.menuBar()
+        self.stop_btn = QPushButton("⏹ Stop")
+        self.stop_btn.setStyleSheet("background-color: #f85149; color: white; border-radius: 4px; padding: 4px 8px; margin-left: 5px;")
+        self.stop_btn.clicked.connect(self.terminal.stop)
+        toolbar.addWidget(self.stop_btn)
 
-        # File menu
-        file_menu = mb.addMenu("File")
-        new_act = QAction("New Chat", self)
-        new_act.setShortcut(QKeySequence("Ctrl+N"))
-        new_act.triggered.connect(self._new_chat)
-        file_menu.addAction(new_act)
+        toolbar.addSeparator()
 
-        file_menu.addSeparator()
+        # Model selection
+        toolbar.addWidget(QLabel(" Modelo: "))
+        self.model_combo = QComboBox()
+        self.model_combo.currentTextChanged.connect(self.on_model_changed)
+        toolbar.addWidget(self.model_combo)
 
-        quit_act = QAction("Quit", self)
-        quit_act.setShortcut(QKeySequence("Ctrl+Q"))
-        quit_act.triggered.connect(QApplication.quit)
-        file_menu.addAction(quit_act)
+        # Status indicator
+        spacer = QWidget()
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        toolbar.addWidget(spacer)
+        self.status_indicator = QLabel("●")
+        self.status_indicator.setStyleSheet("color: gray; font-size: 18px; padding-right: 10px;")
+        toolbar.addWidget(self.status_indicator)
 
-        # View menu
-        view_menu = mb.addMenu("View")
-        mgmt_act = QAction("Management…", self)
-        mgmt_act.setShortcut(QKeySequence("Ctrl+Shift+M"))
-        mgmt_act.triggered.connect(self._open_management)
-        view_menu.addAction(mgmt_act)
+    def _connect_signals(self):
+        self.chat.file_created.connect(self.open_agent_file)
+        self.chat.command_run.connect(self.terminal.run_command)
 
-    # ── Session management ────────────────────────────────────────────────────
+        # Shortcuts
+        self.terminal_toggle_act = QAction("Toggle Terminal", self)
+        self.terminal_toggle_act.setShortcut(QKeySequence("Ctrl+`"))
+        self.terminal_toggle_act.triggered.connect(self.toggle_terminal)
+        self.addAction(self.terminal_toggle_act)
+        
+        self.run_act = QAction("Run Script", self)
+        self.run_act.setShortcut(QKeySequence("F5"))
+        self.run_act.triggered.connect(self.run_current_file)
+        self.addAction(self.run_act)
 
-    def _load_sessions(self) -> None:
-        sessions = session_store.all()
-        self.sidebar.set_sessions(sessions)
+    def open_file_dialog(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Open File", WORKSPACE_PATH)
+        if path:
+            self.editor.open_file(path)
 
-    def _new_chat(self) -> None:
-        session = ChatSession()
-        session_store.save(session)
-        self._current_session = session
-        self.sidebar.add_session(session)
-        self.chat_view.clear_messages()
+    def save_file(self):
+        if not self.editor.current_file:
+            path, _ = QFileDialog.getSaveFileName(self, "Save File", WORKSPACE_PATH)
+            if path:
+                self.editor.current_file = path
+                self.editor.save_file()
+        else:
+            self.editor.save_file()
 
-    def _on_session_selected(self, session_id: str) -> None:
-        session = session_store.get(session_id)
-        if session:
-            self._current_session = session
-            self.chat_view.load_session_messages(session.turns)
+    def open_agent_file(self, path):
+        full_path = os.path.join(WORKSPACE_PATH, path)
+        if os.path.exists(full_path):
+            self.editor.open_file(full_path)
 
-    def _delete_session(self, session_id: str) -> None:
-        session_store.delete(session_id)
-        sessions = session_store.all()
-        self.sidebar.set_sessions(sessions)
-        if self._current_session and self._current_session.id == session_id:
-            if sessions:
-                self._on_session_selected(sessions[0].id)
-            else:
-                self._new_chat()
+    def run_current_file(self):
+        if self.editor.current_file:
+            self.editor.save_file()
+            self.terminal.run_command(f"python3 {self.editor.current_file}")
+        else:
+            QMessageBox.warning(self, "Error", "Guarda el archivo primero")
 
-    # ── Chat ──────────────────────────────────────────────────────────────────
+    def toggle_terminal(self):
+        if self.v_splitter.sizes()[1] == 0:
+            self.v_splitter.setSizes([600, 200])
+        else:
+            self.v_splitter.setSizes([800, 0])
 
-    def _on_message_submitted(self, text: str) -> None:
-        if not self._current_session:
-            self._new_chat()
+    def refresh_models(self):
+        models = self.ollama_client.list_models()
+        self.model_combo.clear()
+        self.model_combo.addItems(models)
+        if "qwen2.5-coder:7b" in models:
+            self.model_combo.setCurrentText("qwen2.5-coder:7b")
 
-        model = self.sidebar.current_model()
-        agent_id = self.sidebar.current_agent_id()
-        agent = agent_store.get(agent_id) or DEFAULT_AGENT
+    def on_model_changed(self, model_name):
+        self.chat.agent.ollama.set_model(model_name)
 
-        self._current_session.add_turn("user", text, model=model)
+    def check_ollama_status(self):
+        if self.ollama_client.check_connection():
+            self.status_indicator.setStyleSheet("color: #3fb950; font-size: 18px; padding-right: 10px;")
+        else:
+            self.status_indicator.setStyleSheet("color: #f85149; font-size: 18px; padding-right: 10px;")
 
-        # Build messages for API
-        messages = self._current_session.to_api_messages(
-            system_prompt=agent.system_prompt or ""
-        )
-
-        t_start = time.time()
-        ai_text_holder = [""]
-
-        def stream_fn():
-            return model_router.resolve_stream(
-                model=model,
-                messages=messages,
-                temperature=agent.temperature or 0.7,
-                max_tokens=agent.max_tokens or 4096,
-            )
-
-        def on_complete(full_text: str) -> None:
-            ai_text_holder[0] = full_text
-            self._current_session.add_turn("assistant", full_text, model=model)
-            session_store.save(self._current_session)
-            self.sidebar.update_session_title(
-                self._current_session.id,
-                self._current_session.title,
-            )
-            # Log inference
-            duration_ms = (time.time() - t_start) * 1000
-            insights.log(
-                model=model,
-                input_tokens=sum(len(m.get("content") or "") // 4 for m in messages),
-                output_tokens=max(1, len(full_text) // 4),
-                duration_ms=duration_ms,
-            )
-
-        self.chat_view.start_streaming(stream_fn, text, on_complete=on_complete)
-
-    # ── Model / Agent ─────────────────────────────────────────────────────────
-
-    def _refresh_models(self) -> None:
-        models = model_router.all_model_names()
-        if not models:
-            models = ["(no models — run: ollama pull qwen2.5:7b)"]
-        self.sidebar.set_models(models)
-
-    def _refresh_agents(self) -> None:
-        self.sidebar.set_agents(agent_store.all())
-
-    def _on_agent_changed(self, agent_id: str) -> None:
-        if self._current_session:
-            self._current_session.agent_id = agent_id
-
-    def _on_model_changed(self, model: str) -> None:
-        if self._current_session:
-            self._current_session.model = model
-
-    # ── Providers ─────────────────────────────────────────────────────────────
-
-    def _refresh_providers(self) -> None:
-        """Register enabled providers into the model router."""
-        for provider in provider_store.enabled():
-            if not provider.base_url:
-                continue
-
-            if provider.preset == "anthropic":
-                svc = AnthropicService(provider.api_key, provider.timeout)
-                models = [provider.default_model] if provider.default_model else []
-                model_router.register_anthropic(provider.id, svc, models)
-            else:
-                svc = RemoteProviderService(
-                    provider.base_url, provider.get_headers(), provider.timeout
-                )
-                # Get remote model list or fall back to the configured default
-                try:
-                    remote_models = svc.list_models()
-                except Exception:
-                    remote_models = []
-                if not remote_models and provider.default_model:
-                    remote_models = [provider.default_model]
-                model_router.register_remote_provider(provider.id, svc, remote_models)
-
-    # ── Management Window ─────────────────────────────────────────────────────
-
-    def _open_management(self) -> None:
-        if not self._mgmt_window:
-            self._mgmt_window = ManagementWindow(self)
-            self._mgmt_window.agents_changed.connect(self._refresh_agents)
-            self._mgmt_window.providers_changed.connect(self._on_providers_changed)
-        self._mgmt_window.show()
-        self._mgmt_window.raise_()
-
-    def _on_providers_changed(self) -> None:
-        self._refresh_providers()
-        QTimer.singleShot(300, self._refresh_models)
