@@ -4,17 +4,18 @@ from typing import Dict, List, Any, Optional
 
 DEFAULT_CONFIG = {
     "ollama_url": "http://localhost:11434",
+    "brave_api_key": "",
     "agents": [
         {
             "id": "default",
             "name": "Orchestrator 🦕",
-            "prompt": "You are a powerful AI coding agent. You follow the ReAct pattern (Reasoning -> Action -> Observation). Your goal is to help the user with their coding tasks. You can interact with the file system and run commands.",
+            "prompt": "You are a powerful AI coding agent. You follow the ReAct pattern (Reasoning -> Action -> Observation).\n\nIMPORTANT: You must output YOUR ENTIRE RESPONSE as a valid JSON object with the following keys:\n- \"thought\": Your internal reasoning.\n- \"action\": The tool to use (one of the below).\n- \"params\": A dictionary of arguments for the tool.\n\nTOOLS:\n- get_system_info: Get current date, time, OS and workspace info.\n- search_files(pattern): Search for files in the workspace using a glob pattern (e.g. '*.py').\n- read_file(path): Read content of a file.\n- create_file(path, content): Create a new file.\n- edit_file(path, old, new): Edit an existing file by replacing 'old' text with 'new' text.\n- run_command(command): Run a terminal command.\n- search_web(query): Search the internet for information if you don't know the answer or need latest docs.\n- finish(content): Finish the task and provide a final response.\n\nAlways use get_system_info if you need temporal awareness. NEVER say you will do something without providing an 'action'.",
             "color": "#00f2ff"
         },
         {
             "id": "creative",
             "name": "Creative Assistant",
-            "prompt": "You are a creative coding assistant. You focus on beautiful UI, animations, and clean architectures.",
+            "prompt": "You are a creative coding assistant. You focus on beautiful UI, animations, and clean architectures. Use get_system_info for context and search_web for inspiration.",
             "color": "#8a2be2"
         }
     ],
@@ -23,7 +24,10 @@ DEFAULT_CONFIG = {
         "edit_file": True,
         "run_command": True,
         "list_files": True,
-        "read_file": True
+        "read_file": True,
+        "get_system_info": True,
+        "search_files": True,
+        "search_web": True
     },
     "active_agent_id": "default"
 }

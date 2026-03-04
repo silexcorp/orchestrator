@@ -22,6 +22,7 @@ class SettingsDialog(QDialog):
         self.tabs.addTab(self._create_agents_tab(), "Agents")
         self.tabs.addTab(self._create_models_tab(), "Models")
         self.tabs.addTab(self._create_tools_tab(), "Tools")
+        self.tabs.addTab(self._create_search_tab(), "Search")
         
         layout.addWidget(self.tabs)
         
@@ -87,6 +88,23 @@ class SettingsDialog(QDialog):
         layout.addWidget(QLabel("\n* Available models are automatically listed in the main toolbar."))
         return tab
 
+    def _create_search_tab(self):
+        tab = QWidget()
+        layout = QFormLayout(tab)
+        
+        self.brave_api_key = QLineEdit(self.config_manager.config.get("brave_api_key", ""))
+        self.brave_api_key.setEchoMode(QLineEdit.EchoMode.Password)
+        self.brave_api_key.setPlaceholderText("Enter Brave Search API Key...")
+        
+        layout.addRow("Brave API Key:", self.brave_api_key)
+        
+        help_text = QLabel("\nTo get an API key, visit: https://api.search.brave.com/")
+        help_text.setOpenExternalLinks(True)
+        help_text.setStyleSheet("color: #8b949e; font-size: 11px;")
+        layout.addWidget(help_text)
+        
+        return tab
+
     def _create_tools_tab(self):
         tab = QWidget()
         layout = QVBoxLayout(tab)
@@ -149,6 +167,7 @@ class SettingsDialog(QDialog):
         
         # Update other tabs
         self.config_manager.config["ollama_url"] = self.ollama_url.text()
+        self.config_manager.config["brave_api_key"] = self.brave_api_key.text()
         
         for tool_id, check in self.tool_checks.items():
             self.config_manager.config["tools"][tool_id] = check.isChecked()

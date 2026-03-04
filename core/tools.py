@@ -1,6 +1,9 @@
 import os
 import subprocess
-from typing import Optional
+import datetime
+import platform
+import fnmatch
+from typing import Optional, List
 
 class ToolExecutor:
     def __init__(self, workspace_path: Optional[str]):
@@ -16,6 +19,70 @@ class ToolExecutor:
         if not normalized.startswith(self.workspace_path):
             raise ValueError("Path is outside the workspace")
         return normalized
+
+    def get_system_info(self) -> str:
+        """Returns current date, time, day of the week, and OS info."""
+        now = datetime.datetime.now()
+        info = [
+            f"Current Date: {now.strftime('%Y-%m-%d')}",
+            f"Current Time: {now.strftime('%H:%M:%S')}",
+            f"Day of the Week: {now.strftime('%A')}",
+            f"Operating System: {platform.system()} {platform.release()}",
+            f"Working Directory: {self.workspace_path or os.getcwd()}"
+        ]
+        return "\n".join(info)
+
+    def search_files(self, pattern: str) -> str:
+        """Search for files matching a glob pattern in the workspace."""
+        if not self.workspace_path:
+            return "Error: No workspace opened."
+        
+        matches = []
+        for root, _, filenames in os.walk(self.workspace_path):
+            for filename in fnmatch.filter(filenames, pattern):
+                rel_path = os.path.relpath(os.path.join(root, filename), self.workspace_path)
+                matches.append(rel_path)
+        
+        if not matches:
+            return f"No files found matching pattern: {pattern}"
+        return "\n".join(matches)
+
+    def search_web(self, query: str, api_key: str) -> str:
+        """Search the web using Brave Search API."""
+        if not api_key:
+            return "Error: Brave Search API Key not configured. Please add it in Settings -> Search."
+        
+        try:
+            import httpx
+            headers = {
+                "Accept": "application/json",
+                "Accept-Encoding": "gzip",
+                "X-Subscription-Token": api_key
+            }
+            params = {"q": query, "count": 5}
+            
+            response = httpx.get(
+                "https://api.search.brave.com/res/v1/web/search",
+                headers=headers,
+                params=params,
+                timeout=10.0
+            )
+            response.raise_for_status()
+            data = response.json()
+            
+            results = []
+            for item in data.get("web", {}).get("results", []):
+                title = item.get("title")
+                url = item.get("description") # Brave uses 'description' for snippet
+                snippet = item.get("description")
+                results.append(f"Title: {title}\nSnippet: {snippet}\nURL: {item.get('url')}\n")
+            
+            if not results:
+                return "No web results found."
+            return "\n---\n".join(results)
+            
+        except Exception as e:
+            return f"Error performing web search: {str(e)}"
 
     def create_file(self, path: str, content: str) -> str:
         try:

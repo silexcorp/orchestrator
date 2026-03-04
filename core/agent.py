@@ -274,17 +274,12 @@ class Agent:
             return self.tools.edit_file(params.get("path"), params.get("old", ""), params.get("new", ""))
         elif action == "read_file":
             return self.tools.read_file(params.get("path"))
-        elif action == "list_files":
-            return self._list_files_tool(params.get("pattern", "*"))
+        elif action == "list_files" or action == "search_files":
+            return self.tools.search_files(params.get("pattern", "*"))
+        elif action == "get_system_info":
+            return self.tools.get_system_info()
+        elif action == "search_web":
+            api_key = self.config_manager.config.get("brave_api_key", "")
+            return self.tools.search_web(params.get("query"), api_key)
         else:
             return f"Unknown action: {action}"
-
-    def _list_files_tool(self, pattern: str) -> str:
-        if not self.tools.workspace_path:
-            return "Error: No workspace opened. Please open a folder first."
-        import fnmatch
-        files = []
-        for root, _, filenames in os.walk(self.tools.workspace_path):
-            for filename in fnmatch.filter(filenames, pattern):
-                files.append(os.path.relpath(os.path.join(root, filename), self.tools.workspace_path))
-        return "\n".join(files) if files else "No files found matching the pattern."
