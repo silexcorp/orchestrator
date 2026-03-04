@@ -1,8 +1,14 @@
 import os
 import re
-from PyQt6.QtWidgets import QPlainTextEdit, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit
-from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeySequence, QShortcut, QFontDatabase, QTextFormat, QPainter
-from PyQt6.QtCore import Qt, QRect, QSize
+from PyQt6.QtWidgets import (
+    QPlainTextEdit, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit,
+    QTabWidget, QTabBar, QMessageBox, QFileDialog
+)
+from PyQt6.QtGui import (
+    QSyntaxHighlighter, QTextCharFormat, QColor, QFont, QKeySequence,
+    QShortcut, QFontDatabase, QTextFormat, QPainter
+)
+from PyQt6.QtCore import Qt, QRect, QSize, pyqtSignal
 
 class PythonHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
@@ -69,10 +75,13 @@ class LineNumberArea(QWidget):
     def paintEvent(self, event):
         self.editor.line_number_area_paint_event(event)
 
-class EditorWidget(QPlainTextEdit):
-    def __init__(self, parent=None):
+class CodeEditor(QPlainTextEdit):
+    text_modified = pyqtSignal()
+
+    def __init__(self, file_path=None, parent=None):
         super().__init__(parent)
-        self.current_file = None
+        self.file_path = file_path
+        self.dirty = False
         
         # Setup Font
         font = QFont("JetBrains Mono", 12)
@@ -96,12 +105,14 @@ class EditorWidget(QPlainTextEdit):
         self.line_number_area = LineNumberArea(self)
         self.blockCountChanged.connect(self.update_line_number_area_width)
         self.updateRequest.connect(self.update_line_number_area)
-        self.cursorPositionChanged.connect(self.highlight_current_line)
         self.update_line_number_area_width(0)
+        
+        self.textChanged.connect(self._on_text_changed)
 
-        # Shortcuts
-        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_file)
-        QShortcut(QKeySequence("Ctrl+Z"), self).activated.connect(self.undo)
+    def _on_text_changed(self):
+        if not self.dirty:
+            self.dirty = True
+            self.text_modified.emit()
 
     def line_number_area_width(self):
         digits = 1
@@ -149,36 +160,110 @@ class EditorWidget(QPlainTextEdit):
             bottom = top + round(self.blockBoundingRect(block).height())
             block_number += 1
 
-    def highlight_current_line(self):
-        extra_selections = []
-        if not self.isReadOnly():
-            selection = QTextEdit.ExtraSelection()
-            line_color = QColor("#21262d")
-            selection.format.setBackground(line_color)
-            selection.format.setProperty(QTextFormat.Property.FullWidthSelection, True)
-            selection.cursor = self.textCursor()
-            selection.cursor.clearSelection()
-            extra_selections.append(selection)
-        self.setExtraSelections(extra_selections)
+class EditorWidget(QTabWidget):
+    active_file_changed = pyqtSignal(str, str) # path, content
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setTabsClosable(True)
+        self.setMovable(True)
+        self.tabCloseRequested.connect(self.close_tab)
+        self.currentChanged.connect(self._on_tab_changed)
+        
+        self.setStyleSheet("""
+            QTabWidget::pane { border: none; background: #0d1117; }
+            QTabBar::tab { background: #161b22; color: #8b949e; padding: 8px 12px; border-right: 1px solid #30363d; }
+            QTabBar::tab:selected { background: #0d1117; color: #e6edf3; }
+        """)
+
+        # Shortcuts
+        QShortcut(QKeySequence("Ctrl+W"), self, self.close_active_tab)
+        QShortcut(QKeySequence("Ctrl+Tab"), self, self.next_tab)
+
+    def close_active_tab(self):
+        idx = self.currentIndex()
+        if idx >= 0: self.close_tab(idx)
+
+    def next_tab(self):
+        count = self.count()
+        if count <= 1: return
+        next_idx = (self.currentIndex() + 1) % count
+        self.setCurrentIndex(next_idx)
 
     def open_file(self, path):
+        path = os.path.abspath(path)
+        # Check if already open
+        for i in range(self.count()):
+            if self.widget(i).file_path == path:
+                self.setCurrentIndex(i)
+                return
+        
         try:
             with open(path, 'r', encoding='utf-8') as f:
-                self.setPlainText(f.read())
-            self.current_file = path
+                content = f.read()
+            
+            editor = CodeEditor(path)
+            editor.setPlainText(content)
+            editor.dirty = False
+            editor.text_modified.connect(lambda: self._update_tab_title(editor))
+            
+            index = self.addTab(editor, os.path.basename(path))
+            self.setCurrentIndex(index)
         except Exception as e:
-            print(f"Error opening file: {e}")
+            QMessageBox.critical(self, "Error", f"Could not open file: {e}")
 
-    def save_file(self):
-        if self.current_file:
-            try:
-                with open(self.current_file, 'w', encoding='utf-8') as f:
-                    f.write(self.toPlainText())
-            except Exception as e:
-                print(f"Error saving file: {e}")
+    def _update_tab_title(self, editor):
+        for i in range(self.count()):
+            if self.widget(i) == editor:
+                title = os.path.basename(editor.file_path)
+                if editor.dirty:
+                    title += " ●"
+                self.setTabText(i, title)
+                break
 
-    def get_content(self):
-        return self.toPlainText()
+    def close_tab(self, index):
+        editor = self.widget(index)
+        if editor.dirty:
+            res = QMessageBox.question(self, "Guardar cambios", 
+                                     f"¿Deseas guardar los cambios en {os.path.basename(editor.file_path)}?",
+                                     QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel)
+            if res == QMessageBox.StandardButton.Save:
+                self.save_file(index)
+            elif res == QMessageBox.StandardButton.Cancel:
+                return
+        
+        self.removeTab(index)
 
-    def set_content(self, text):
-        self.setPlainText(text)
+    def save_file(self, index=None):
+        if index is None: index = self.currentIndex()
+        if index < 0: return
+        
+        editor = self.widget(index)
+        if not editor.file_path:
+            path, _ = QFileDialog.getSaveFileName(self, "Guardar como")
+            if path:
+                editor.file_path = os.path.abspath(path)
+                self.setTabText(index, os.path.basename(path))
+            else:
+                return
+        
+        try:
+            with open(editor.file_path, 'w', encoding='utf-8') as f:
+                f.write(editor.toPlainText())
+            editor.dirty = False
+            self.setTabText(index, os.path.basename(editor.file_path))
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Could not save file: {e}")
+
+    def get_active_file(self):
+        idx = self.currentIndex()
+        if idx >= 0:
+            return self.widget(idx).file_path
+        return None
+
+    def _on_tab_changed(self, index):
+        if index >= 0:
+            editor = self.widget(index)
+            self.active_file_changed.emit(editor.file_path, editor.toPlainText())
+        else:
+            self.active_file_changed.emit("", "")

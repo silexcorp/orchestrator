@@ -1,8 +1,8 @@
 import ollama
-from typing import Generator, List
+from typing import Generator, List, Optional
 
 class OllamaClient:
-    def __init__(self, model: str = "qwen2.5-coder:7b"):
+    def __init__(self, model: Optional[str] = None):
         self.model = model
 
     def set_model(self, model_name: str):
@@ -25,6 +25,9 @@ class OllamaClient:
             return []
 
     def chat_stream(self, messages: List[dict], system: str = None) -> Generator[str, None, None]:
+        if not self.model:
+            yield "Error: No se ha seleccionado ningún modelo en la interfaz."
+            return
         msgs = []
         if system:
             msgs.append({'role': 'system', 'content': system})
@@ -41,7 +44,7 @@ class OllamaClient:
         except Exception as e:
             yield f"Error in chat_stream: {str(e)}"
 
-    def check_connection(self) -> bool:
+    def is_connected(self) -> bool:
         try:
             ollama.list()
             return True

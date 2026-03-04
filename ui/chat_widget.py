@@ -1,5 +1,6 @@
 import json
-from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from typing import Optional
+from PyQt6.QtCore import QThread, pyqtSignal, Qt, QTimer
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame
 from .chat_view import ChatView, MessageBubble
 from core.agent import Agent
@@ -26,10 +27,10 @@ class AgentChatWidget(ChatView):
     file_created = pyqtSignal(str)
     command_run = pyqtSignal(str)
 
-    def __init__(self, workspace_path: str, model_name: str = "qwen2.5-coder:7b", parent=None):
+    def __init__(self, workspace_manager, model_name: Optional[str] = None, parent=None):
         super().__init__(parent)
-        self.workspace_path = workspace_path
-        self.agent = Agent(workspace_path, model_name)
+        self.workspace_manager = workspace_manager
+        self.agent = Agent(workspace_manager, model_name)
         self.worker = None
 
     def _submit_text(self, text: str) -> None:
@@ -82,34 +83,36 @@ class AgentChatWidget(ChatView):
 
     def add_thought_bubble(self, content):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #161b22; border-radius: 8px; border: 1px solid #30363d; margin: 4px;")
+        bubble.setStyleSheet("background-color: #161b22; border-radius: 8px; border: 1px solid #30363d; margin: 4px; padding: 4px;")
         layout = QVBoxLayout(bubble)
-        label = QLabel(f"🧠 <i>Pensando...</i><br><small>{content}</small>")
-        label.setStyleSheet("color: #8b949e;")
+        label = QLabel(f"<b>🧠 Pensamiento</b><br><span style='color: #8b949e;'>{content}</span>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
         self.msgs_layout.insertWidget(self.msgs_layout.count() - 1, bubble)
+        QTimer.singleShot(50, self._scroll_bottom)
 
     def add_action_bubble(self, action, params):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #d29922; border-radius: 8px; color: #0d1117; margin: 4px;")
+        bubble.setStyleSheet("background-color: #d29922; border-radius: 8px; color: #0d1117; margin: 4px; padding: 4px;")
         layout = QVBoxLayout(bubble)
         param_str = json.dumps(params, indent=2)
-        label = QLabel(f"⚙️ <b>Acción: {action}</b><br><pre>{param_str}</pre>")
+        label = QLabel(f"⚙️ <b>Ejecutando: {action}</b><br><pre style='font-size: 10px;'>{param_str}</pre>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
         self.msgs_layout.insertWidget(self.msgs_layout.count() - 1, bubble)
+        QTimer.singleShot(50, self._scroll_bottom)
 
     def add_observation_bubble(self, content):
         bubble = QFrame()
-        bubble.setStyleSheet("background-color: #238636; border-radius: 8px; color: white; margin: 4px;")
+        bubble.setStyleSheet("background-color: #238636; border-radius: 8px; color: white; margin: 4px; padding: 4px;")
         layout = QVBoxLayout(bubble)
         # Truncate long observations
         display_content = (content[:500] + '...') if len(content) > 500 else content
-        label = QLabel(f"👁️ <b>Observación:</b><br><pre>{display_content}</pre>")
+        label = QLabel(f"👁️ <b>Observación</b><br><pre style='font-size: 10px;'>{display_content}</pre>")
         label.setWordWrap(True)
         label.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(label)
         self.msgs_layout.insertWidget(self.msgs_layout.count() - 1, bubble)
+        QTimer.singleShot(50, self._scroll_bottom)

@@ -322,15 +322,17 @@ class ChatView(QWidget):
         self.input.setFocus()
 
     def _on_error(self, msg: str) -> None:
+        error_html = (
+            f"<div style='background:#2a1520; border:1px solid #7c2a3a; padding:10px; border-radius:5px;'>"
+            f"<span style='color:#ff8888'>⚠ Error: {msg}</span><br><br>"
+            "<code>¿Está Ollama corriendo?  →  <b>ollama serve</b></code>"
+            f"</div>"
+        )
         if self._current_ai_bubble:
-            error_html = (
-                f"<span style='color:#ff8888'>⚠ Error: {msg}</span><br><br>"
-                "<code>Is Ollama running?  →  <b>ollama serve</b></code>"
-            )
             self._current_ai_bubble.bubble.setText(error_html)
-            self._current_ai_bubble.bubble.setStyleSheet(
-                "background:#2a1520; border:1px solid #7c2a3a;"
-            )
+        else:
+            bubble = self._add_bubble(error_html, "assistant")
+            bubble.bubble.setTextFormat(Qt.TextFormat.RichText)
         self._current_ai_bubble = None
         self.send_btn.setVisible(True)
         self.stop_btn.setVisible(False)

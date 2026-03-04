@@ -3,12 +3,14 @@ import subprocess
 from typing import Optional
 
 class ToolExecutor:
-    def __init__(self, workspace_path: str):
-        self.workspace_path = os.path.expanduser(workspace_path)
-        if not os.path.exists(self.workspace_path):
+    def __init__(self, workspace_path: Optional[str]):
+        self.workspace_path = os.path.abspath(os.path.expanduser(workspace_path)) if workspace_path else None
+        if self.workspace_path and not os.path.exists(self.workspace_path):
             os.makedirs(self.workspace_path)
 
     def _full_path(self, path: str) -> str:
+        if not self.workspace_path:
+            raise ValueError("No workspace opened. Please open a folder first.")
         # Prevent path traversal
         normalized = os.path.normpath(os.path.join(self.workspace_path, path))
         if not normalized.startswith(self.workspace_path):
