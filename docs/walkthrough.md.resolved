@@ -1,0 +1,26 @@
+# Walkthrough: Creación del Ejecutable para Orchestrator
+
+He configurado con éxito el proceso de empaquetado para tu proyecto, permitiéndote generar un archivo ejecutable independiente para Linux.
+
+## Cambios Realizados
+
+1.  **Instalación de PyInstaller**: Se instaló `pyinstaller` en el entorno virtual (`venv`).
+2.  **Script de Construcción**: He creado un script llamado [build_executable.sh](file:///home/lex/Documents/Antigravity/orchestrator/build_executable.sh) para automatizar el proceso.
+3.  **Generación del Ejecutable**: Se ejecutó el proceso y se generó el binario en la carpeta `dist/`.
+
+## Cómo usar el ejecutable
+
+1.  El archivo ejecutable se encuentra en: [/home/lex/Documents/Antigravity/orchestrator/dist/Orchestrator](file:///home/lex/Documents/Antigravity/orchestrator/dist/Orchestrator)
+2.  Puedes ejecutarlo desde la terminal con:
+    ```bash
+    ./dist/Orchestrator
+    ```
+3.  Si realizas cambios en el código y quieres generar una nueva versión del ejecutable, simplemente ejecuta el script:
+    ```bash
+    ./build_executable.sh
+    ```
+
+## Detalles Técnicos
+- **Tamaño del binario**: Aproximadamente 57 MB.
+- **Tipo**: Binario independiente (ELF 64-bit).
+- **Dependencias**: Incluye todas las dependencias de Python y PyQt6 necesarias para su funcionamiento.

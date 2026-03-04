@@ -11,14 +11,21 @@ rm -rf build dist *.spec
 # Ejecutar PyInstaller
 # --onefile: Un solo archivo ejecutable
 # --windowed: No abrir consola al ejecutar
-# --add-data: Incluir directorios necesarios
+# --add-data: Incluir solo recursos NO-Python (imágenes, etc.)
+# --collect-all: Asegura que se incluyan dependencias complejas si es necesario
 # --noconfirm: No pedir confirmación para sobreescribir
-pyinstaller --onefile --windowed \
+source venv/bin/activate && \
+rm -rf build dist Orchestrator *.spec && \
+pyinstaller --onefile \
     --name "Orchestrator" \
-    --add-data "core:core" \
+    --paths "." \
     --add-data "ui:ui" \
+    --add-data "core:core" \
     --add-data "styles.py:." \
-    --add-data "screenshot:screenshot" \
-    main.py
+    --collect-all "pymdownx" \
+    --collect-all "markdown" \
+    --noconfirm \
+    main.py && \
+cp dist/Orchestrator ./Orchestrator
 
 echo "Construcción completada. El ejecutable se encuentra en la carpeta 'dist/'"

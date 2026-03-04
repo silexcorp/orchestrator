@@ -3,6 +3,7 @@ main.py — Entry point for Orchestrator AI Code Editor.
 """
 import sys
 import os
+import json
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QFont, QFontDatabase
 from PyQt6.QtCore import Qt
