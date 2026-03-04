@@ -11,6 +11,8 @@ Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 a
 - **Multi-Tab Editor**: Edit multiple files simultaneously with syntax highlighting, line numbers, and unsaved change detection (dirty indicators).
 - **Workspace Management**: Open entire folders as projects. The file tree sidebar allows easy navigation and real-time filesystem monitoring via `watchdog`.
 - **Integrated Terminal**: Run commands directly within the editor with real-time output.
+- **Model Memory Optimization**: Automatically unloads models from GPU/RAM upon application closure, freeing up system resources.
+- **Robust JSON Parsing**: Advanced agent response extraction with structural repair logic to handle truncated or malformed JSON from models.
 - **Session Persistence**: Automatically restores your last workspace, open tabs, window layout, and preferred Ollama model.
 - **Modern Dark Theme**: High-contrast UI inspired by GitHub's dark mode.
 - **Model Selector**: Switch between local Ollama models on the fly.

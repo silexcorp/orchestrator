@@ -19,6 +19,8 @@ Referencia de las capacidades actuales de la versión Python de Orchestrator.
 | **Workspace (IDE)** | Estable | Apertura de carpetas, árbol de archivos y contexto dinámico. |
 | **Multi-Tab Editor**| Estable | Soporte para múltiples archivos con pestañas y resaltado. |
 | **Persistencia** | Estable | Guardado automático del estado de la sesión (tabs, layout). |
+| **Optimización VRAM**| Estable | Descarga automática de modelos al cerrar para liberar GPU. |
+| **JSON Robust** | Estable | Reparación estructural de respuestas truncadas o malformadas. |
 
 ---
 

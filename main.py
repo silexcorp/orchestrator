@@ -13,7 +13,7 @@ from styles import STYLESHEET
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("Orchestrator AI")
-    app.setOrganizationName("Antigravity")
+    app.setOrganizationName("We are Okan")
 
     # Load Fonts if available
     # QFontDatabase.addApplicationFont("path/to/font.ttf")

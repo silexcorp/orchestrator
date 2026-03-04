@@ -50,3 +50,20 @@ class OllamaClient:
             return True
         except:
             return False
+
+    def unload_model(self, model_name: Optional[str] = None):
+        """
+        Unloads a model from memory by setting keep_alive to 0.
+        If no model_name is provided, it uses the currently set model.
+        """
+        m = model_name or self.model
+        if not m:
+            return
+        
+        try:
+            # Setting keep_alive=0 in any request will unload the model after the request
+            # We use an empty prompt to minimize processing
+            ollama.generate(model=m, prompt="", keep_alive=0)
+            print(f"Model {m} unloaded.")
+        except Exception as e:
+            print(f"Failed to unload model {m}: {e}")

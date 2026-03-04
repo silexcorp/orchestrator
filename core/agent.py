@@ -10,6 +10,7 @@ SYSTEM_PROMPT = """You are a powerful AI coding agent. You follow the ReAct patt
 Your goal is to help the user with their coding tasks. You can interact with the file system and run commands.
 
 SIEMPRE responde en formato JSON con los campos: "thought", "action", "params".
+IMPORTANTE: Asegúrate de que el JSON sea válido. NO incluyas comas sobrantes al final de los diccionarios.
 
 Available actions:
 1. create_file: {"path": "file_path", "content": "file_content"}
@@ -59,7 +60,7 @@ class Agent:
             for chunk in self.ollama.chat_stream(self.history, system=dynamic_system_prompt):
                 full_response += chunk
             
-            # Clean response if it contains markdown code blocks
+            # Clean and repair JSON
             clean_json = self._extract_json(full_response)
             
             try:
@@ -93,17 +94,36 @@ class Agent:
 
     def _extract_json(self, text: str) -> str:
         # Try to find JSON inside markdown blocks
+        json_str = text
         match = re.search(r'```json\s*(.*?)\s*```', text, re.DOTALL)
         if match:
-            return match.group(1)
+            json_str = match.group(1)
+        else:
+            # Fallback: look for the first { and last }
+            start = text.find('{')
+            end = text.rfind('}')
+            if start != -1:
+                if end != -1 and end > start:
+                    json_str = text[start:end+1]
+                else:
+                    json_str = text[start:]
         
-        # Fallback: look for the first { and last }
-        start = text.find('{')
-        end = text.rfind('}')
-        if start != -1 and end != -1 and end > start:
-            return text[start:end+1]
+        # Repair common JSON errors from LLMs
+        # 1. Remove trailing commas before } or ]
+        json_str = re.sub(r',\s*([\]}])', r'\1', json_str)
+        
+        # 2. Structural repair for truncated JSON (balance braces/brackets)
+        open_braces = json_str.count('{')
+        close_braces = json_str.count('}')
+        if open_braces > close_braces:
+            json_str += '}' * (open_braces - close_braces)
             
-        return text.strip()
+        open_brackets = json_str.count('[')
+        close_brackets = json_str.count(']')
+        if open_brackets > close_brackets:
+            json_str += ']' * (open_brackets - close_brackets)
+            
+        return json_str.strip()
 
     def _execute_tool(self, action: str, params: Dict[str, Any]) -> str:
         if action == "create_file":

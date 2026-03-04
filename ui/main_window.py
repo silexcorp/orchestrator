@@ -202,6 +202,16 @@ class MainWindow(QMainWindow):
                     return
         
         self._save_session()
+        
+        # Unload model to free memory
+        try:
+            current_model = self.model_combo.currentText()
+            if current_model:
+                client = OllamaClient()
+                client.unload_model(current_model)
+        except Exception as e:
+            print(f"Could not unload model on close: {e}")
+            
         super().closeEvent(event)
 
     def _populate_models(self):
