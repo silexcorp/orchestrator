@@ -73,7 +73,7 @@ class MessageBubble(QWidget):
         layout.setSpacing(4)
 
         # Antigravity Minimal Role label
-        role_label = QLabel("YOU" if self._role == "user" else "ANTIGRAVITY")
+        role_label = QLabel("YOU" if self._role == "user" else "AGENT")
         role_label.setStyleSheet(f"font-weight: bold; color: {'#00f2ff' if self._role != 'user' else '#8a2be2'}; font-size: 10px; letter-spacing: 2px;")
         if self._role == "user":
             role_label.setAlignment(Qt.AlignmentFlag.AlignRight)
