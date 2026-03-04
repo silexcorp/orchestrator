@@ -1,4 +1,4 @@
-# Orchestrator AI Code Editor 🦕
+# Orchestrator AI 🦕
 
 Orchestrator is a powerful, agentic AI code editor for Linux, built with PyQt6 and powered by Ollama. It provides a seamless development experience with an integrated AI agent capable of understanding project context, editing files, and running terminal commands.
 

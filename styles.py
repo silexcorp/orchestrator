@@ -1,4 +1,4 @@
-"""Global stylesheet for Orchestrator AI Code Editor."""
+"""Global stylesheet for Orchestrator AI."""
 
 STYLESHEET = """
 /* ── Base ───────────────────────────────────────────────────────────────── */

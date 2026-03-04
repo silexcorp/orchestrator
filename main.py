@@ -1,5 +1,5 @@
 """
-main.py — Entry point for Orchestrator AI Code Editor.
+main.py — Entry point for Orchestrator AI.
 """
 import sys
 import os

@@ -20,7 +20,7 @@ from core.session import SessionManager
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Orchestrator AI Code Editor")
+        self.setWindowTitle("Orchestrator AI")
         self.resize(1200, 800)
         
         self.workspace_manager = WorkspaceManager()
