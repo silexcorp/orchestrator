@@ -69,4 +69,4 @@ Los datos y la configuración se guardan en `~/.config/orchestrator/`:
 
 ---
 
-Creado originalmente por Dinoki Labs y portado a Linux/Python por Antigravity.
+We are Okan.
